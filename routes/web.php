@@ -16,3 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route pour le lien de réinitialisation de mot de passe (redirige vers Angular)
+Route::get('/password/reset/{token}', function ($token) {
+    return redirect('http://localhost:4200/reset-password?token=' . $token . '&email=' . request('email'));
+})->name('password.reset');

@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Response;
 use OpenApi\Annotations as OA;
 use OpenApi\Generator;
 use OpenApi\Annotations\Info;
+use App\Mail\testmail;
+use Illuminate\Support\Facades\Mail;
+
 
 /**
  * @OA\Info(
@@ -121,13 +124,15 @@ public function register( request $request )
 {     $request->validate([
     'name'=>'required|string',
     'email'=>'required|email|unique:users,email',
-    'password'=>'required|string|confirmed'
+    'password'=>'required|string|confirmed|min:6'
 ]);
       $user= user ::create ([
     'name'=>$request -> name ,
     'email'=>$request -> email,
     'password'=>hash::make ($request->password) 
     ]);
+
+Mail::to($user->email)->send(new testmail());
       return response()->json ([
     'message'=>'user registered successfully',
     'user'=>$user
