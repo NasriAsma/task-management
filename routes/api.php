@@ -20,8 +20,10 @@ Use App\Http\Controllers\PasswordResetController;
 Route:: post ('/register',[AuthController::class,'register']);
 Route:: post ('/login',[AuthController::class,'login']);
 
-Route :: post( '/forgot-password',[PasswordResetController::class,'sendResetLink']);
+Route ::post( '/forgot-password',[PasswordResetController::class,'sendResetLink']);
 Route ::post ('/reset-password',[PasswordResetController::class,'resetPassword']);
+
+Route::post('/verify-2fa', [AuthController::class, 'verify2fa']);
 
 
 Route::middleware('auth:sanctum')->post('/logout',[AuthController::class,'logout']);

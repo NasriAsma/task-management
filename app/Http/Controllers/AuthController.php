@@ -64,29 +64,71 @@ class AuthController extends Controller
  *     )
  * )
  */
-public function login( request $request)
-{  
+public function login(Request $request)
+{
     $request->validate([
-    'email'=>'required|email',
-    'password'=>'required|string'
-]);
-if (!auth::attempt ($request->only ('email','password')))
-  {   
-    return response()->json ([
-    'message'=>'invalid ', 
-   ],401);
+        'email'    => 'required|email',
+        'password' => 'required|string'
+    ]);
+
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return response()->json(['message' => 'invalid'], 401);
+    }
+
+    $user = User::where('email', $request->email)->firstOrFail();
+
+    // Génère et enregistre le code 2FA
+    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $user->code_2FA = $code;
+    $user->code_2FA_expiry = now()->addMinutes(5);
+    $user->save();
+
+    // Envoi par email
+    Mail::raw("Votre code 2FA est : {$code}", function ($message) use ($user) {
+        $message->to($user->email)->subject('Code 2FA');
+    });
+
+    Auth::logout(); // force la seconde étape
+
+    return response()->json([
+        'requires_2fa' => true,
+        'message'      => 'Code envoyé par email'
+    ], 200);
 }
 
-$user= user::where( 'email',$request->email )-> firstorfail();
-$token=$user -> createtoken('auth_token')->plainTextToken;  //création de token
-return response()->json ([
-  'message'=> 'successfully',
-  'user'=>$user,
-  'access_token'=>$token,
-])
- 
-;
+public function verify2fa(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'code'  => 'required|string'
+    ]);
+
+    $user = User::where('email', $request->email)->first();
+    if (!$user || !$user->code_2FA || !$user->code_2FA_expiry) {
+        return response()->json(['message' => 'session expired'], 401);
+    }
+
+    if ($user->code_2FA !== $request->code || now()->greaterThan($user->code_2FA_expiry)) {
+        return response()->json(['message' => 'invalid 2FA code'], 422);
+    }
+
+    // Code valide : on nettoie et on délivre le token
+    $user->forceFill([
+        'code_2FA'         => null,
+        'code_2FA_expiry'  => null,
+    ])->save();
+
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'message'      => 'successfully',
+        'user'         => $user,
+        'access_token' => $token,
+    ], 200);
 }
+
+
+
 
 
 

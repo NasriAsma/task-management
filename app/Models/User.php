@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'code_2FA',
+        'code_2FA_expiry',
+
     ];
 
     /**
@@ -30,7 +33,8 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'remember_token'
+      
     ];
 
     /**
@@ -40,5 +44,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'code_2FA_expiry' => 'datetime',
+
     ];
+
+
+  
 }

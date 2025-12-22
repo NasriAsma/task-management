@@ -23,7 +23,7 @@ class testmail extends Mailable
 public function envelope()
     {
         return new Envelope(
-            subject: 'Test',
+            subject: 'Votre inscription a été validée avec succès.',
         );
     }
     /**

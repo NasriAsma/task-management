@@ -86,7 +86,7 @@ public function resetPassword(Request $request)
     $request->validate([
         'token' => 'required|string',
         'email' => 'required|email|exists:users,email',
-        'password' => 'required|string|confirmed|min:6'
+        'password' => 'required|string|confirmed'
     ]);
 
     $status = Password::reset(
@@ -103,10 +103,9 @@ public function resetPassword(Request $request)
         : response()->json(['message' => 'Token invalide ou expiré'], 422);
 }
 
+
+
 }
-
-
-
 
 
 
