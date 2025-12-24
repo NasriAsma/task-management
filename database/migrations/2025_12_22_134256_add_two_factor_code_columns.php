@@ -9,6 +9,7 @@ class AddTwoFactorCodeColumns extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_2fa_enabled')->default(true);
             $table->string('code_2FA')->nullable();
             $table->dateTime('code_2FA_expiry')->nullable();
         });
@@ -17,7 +18,7 @@ class AddTwoFactorCodeColumns extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['code_2FA', 'code_2FA_expiry']);
+            $table->dropColumn(['is_2fa_enabled', 'code_2FA', 'code_2FA_expiry']);
         });
     }
 }

@@ -68,7 +68,7 @@ public function login(Request $request)
 {
     $request->validate([
         'email'    => 'required|email',
-        'password' => 'required|string'
+        'password' => 'required|string',
     ]);
 
     if (!Auth::attempt($request->only('email', 'password'))) {
@@ -77,24 +77,34 @@ public function login(Request $request)
 
     $user = User::where('email', $request->email)->firstOrFail();
 
-    // Génère et enregistre le code 2FA
+    // Si 2FA n'est pas activée, on renvoie directement le token
+    if ($user->is_2fa_enabled==0) {
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json([
+            'message'      => 'successfully',
+            'user'         => $user,
+            'access_token' => $token,
+        ], 200);
+    }
+
+    // 2FA activée: générer et envoyer le code, puis exiger vérification
     $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     $user->code_2FA = $code;
     $user->code_2FA_expiry = now()->addMinutes(5);
     $user->save();
 
-    // Envoi par email
     Mail::raw("Votre code 2FA est : {$code}", function ($message) use ($user) {
         $message->to($user->email)->subject('Code 2FA');
     });
 
-    Auth::logout(); // force la seconde étape
+    Auth::logout();
 
     return response()->json([
         'requires_2fa' => true,
         'message'      => 'Code envoyé par email'
     ], 200);
 }
+
 
 public function verify2fa(Request $request)
 {
@@ -119,7 +129,6 @@ public function verify2fa(Request $request)
     ])->save();
 
     $token = $user->createToken('auth_token')->plainTextToken;
-
     return response()->json([
         'message'      => 'successfully',
         'user'         => $user,
@@ -211,4 +220,7 @@ public function logout(request $request)
     'message' => ' logged out successfully'
   ]);
 }
+
+ 
+
 }

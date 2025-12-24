@@ -23,7 +23,7 @@ class User extends Authenticatable
         'password',
         'code_2FA',
         'code_2FA_expiry',
-
+        'is_2fa_enabled'
     ];
 
     /**
