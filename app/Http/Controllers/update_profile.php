@@ -18,14 +18,14 @@ use Illuminate\Support\Facades\Mail;
 class update_profile extends Controller
 {    
 
-    public function  verif2FA(Request $request)
+    public function t(Request $request)
     {
         $user = $request->user();
         if ($request->has('is_2fa_enabled')) {
             $request->validate(['is_2fa_enabled' => 'required|boolean']);
             $user->is_2fa_enabled = (bool) $request->is_2fa_enabled;     
             //recupère la valeur 0,1 de la valeur is_2fa_enabled ET CONVERTIR en booleen 
-                //puis stocker dans la colonne is_2fa_enabled 
+            //puis stocker dans la colonne is_2fa_enabled 
 
         } else {   //SI MON requete vide alors on desactive par inverser la valeur actuelle
             $user->is_2fa_enabled = !$user->is_2fa_enabled; 
@@ -80,19 +80,11 @@ public function updateUser(request $request)
     $is_sensitive = $request->filled('email') || $request->filled('password');
     
     if ($is_sensitive) {
-        $request->validate([
-            'code_2fa' => 'required|string',
-        ]);
+      
 
         if (!$user->code_2FA || !$user->code_2FA_expiry) {
             return response()->json([
                 'message' => 'Veuillez d\'abord demander un code de vérification'
-            ], 422);
-        }
-
-        if ($user->code_2FA !== $request->code_2fa || now()->greaterThan($user->code_2FA_expiry)) {
-            return response()->json([
-                'message' => 'Code 2FA invalide ou expiré'
             ], 422);
         }
     }
