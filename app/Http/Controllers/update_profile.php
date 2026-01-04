@@ -84,7 +84,7 @@ public function updateUser(request $request)
 
         if (!$user->code_2FA || !$user->code_2FA_expiry) {
             return response()->json([
-                'message' => 'Veuillez d\'abord demander un code de vérification'
+                'message' => 'Veuillez d\'abord demander un code de verification'
             ], 422);
         }
     }
