@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Mail;
 class update_profile extends Controller
 {    
 
-    public function t(Request $request)
+    public function toggle2FA(Request $request)
     {
         $user = $request->user();
         if ($request->has('is_2fa_enabled')) {
