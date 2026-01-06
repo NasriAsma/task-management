@@ -31,3 +31,4 @@ Route::middleware('auth:sanctum')->post('/logout',[AuthController::class,'logout
 Route::middleware('auth:sanctum')->post('/toggle-2fa',[update_profile::class,'toggle2FA']);
 Route::middleware('auth:sanctum')->post('/request-update-code',[update_profile::class,'requestUpdateCode']);
 Route::middleware('auth:sanctum')->put('/update-profile',[update_profile::class,'updateUser']);
+Route::middleware('auth:sanctum')->get('/user',[update_profile::class,'getUser']);

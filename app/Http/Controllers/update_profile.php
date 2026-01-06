@@ -126,4 +126,15 @@ public function updateUser(request $request)
         'user' => $user,
     ], 200);
 }
+
+public function getUser(Request $request)
+{
+    $user = $request->user();
+
+    return response()->json([
+        'user' => $user,
+    ], 200);
+}
+
+
 }
