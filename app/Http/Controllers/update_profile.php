@@ -127,6 +127,7 @@ public function updateUser(request $request)
     ], 200);
 }
 
+
 public function getUser(Request $request)
 {
     $user = $request->user();
@@ -135,6 +136,9 @@ public function getUser(Request $request)
         'user' => $user,
     ], 200);
 }
+
+
+
 
 
 }

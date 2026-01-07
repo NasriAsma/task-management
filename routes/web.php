@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +22,6 @@ Route::get('/', function () {
 Route::get('/password/reset/{token}', function ($token) {
     return redirect('http://localhost:4200/reset-password?token=' . $token . '&email=' . request('email'));
 })->name('password.reset');
+
+// Alias web pour assigner un rôle via query string, protégé par Sanctum
+Route::middleware('auth:sanctum')->get('/assign-role', [RoleController::class, 'assignRole']);

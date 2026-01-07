@@ -19,20 +19,16 @@ return [
 
     'allowed_methods' => ['*'],
 
-    // Allow Angular dev servers explicitly so credentials can be used
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://localhost:3000', 'http://localhost:4200', 'http://127.0.0.1:3000', 'http://127.0.0.1:4200'],
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
-    // Expose Authorization header if you read it client-side
     'exposed_headers' => ['Authorization'],
 
-    // Cache preflight responses (in seconds) to reduce CORS latency
     'max_age' => 86400,
 
-    // Enable credentials for cookie-based auth (Sanctum SPA) or if Angular sets withCredentials
     'supports_credentials' => true,
 
 ];

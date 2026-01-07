@@ -26,6 +26,16 @@ class User extends Authenticatable
         'is_2fa_enabled'
     ];
 
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
+
+    public function hasRole($roleName)
+    {
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

@@ -32,3 +32,6 @@ Route::middleware('auth:sanctum')->post('/toggle-2fa',[update_profile::class,'to
 Route::middleware('auth:sanctum')->post('/request-update-code',[update_profile::class,'requestUpdateCode']);
 Route::middleware('auth:sanctum')->put('/update-profile',[update_profile::class,'updateUser']);
 Route::middleware('auth:sanctum')->get('/user',[update_profile::class,'getUser']);
+Route::middleware('auth:sanctum')->post('/assign-role/{roleName}', [App\Http\Controllers\RoleController::class, 'assignRole']);
+Route::middleware('auth:sanctum')->get('/has-role/{roleName}', [App\Http\Controllers\RoleController::class, 'hasRole']);
+Route::middleware('auth:sanctum')->get('/get-roles', [App\Http\Controllers\RoleController::class, 'getRoles']);
