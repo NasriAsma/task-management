@@ -8,16 +8,11 @@ use App\Models\User;
 
 class RoleController extends Controller
 {
-    public function assignRole(Request $request, $roleName = null)
+    public function assignRole(Request $request, $roleName)
     {
         $user = $request->user();
         if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
-        }
-
-        $roleName = $roleName ?? $request->query('roleName');
-        if (!$roleName) {
-            return response()->json(['message' => 'roleName is required'], 422);
         }
 
         $role = Role::where('name', $roleName)->first();
