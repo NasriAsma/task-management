@@ -35,3 +35,11 @@ Route::middleware('auth:sanctum')->get('/user',[update_profile::class,'getUser']
 Route::middleware('auth:sanctum')->post('/assign-role/{roleName}', [App\Http\Controllers\RoleController::class, 'assignRole']);
 Route::middleware('auth:sanctum')->get('/has-role/{roleName}', [App\Http\Controllers\RoleController::class, 'hasRole']);
 Route::middleware('auth:sanctum')->get('/get-roles', [App\Http\Controllers\RoleController::class, 'getRoles']);
+
+
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::post('/createUser', [UserController::class,'createUser']);
+    Route::get('/users', [UserController::class,'index']);
+    Route::put('/updateUser/{id}', [UserController::class,'updateUser']);
+    Route::delete('/deleteUser/{id}', [UserController::class,'deleteUser']);
+    });

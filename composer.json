@@ -13,7 +13,8 @@
         "laravel/framework": "^9.52",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.5",
-        "pragmarx/google2fa": "^9.0"
+        "pragmarx/google2fa": "^9.0",
+        "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.0",
