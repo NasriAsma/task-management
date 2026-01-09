@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
+
+        Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->enum('name', ['admin', 'employe', 'emploi'])->unique();
+            $table->string('name')->unique();
             $table->string('description')->nullable();
             $table->timestamps();
         });
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles');
+        //
     }
 };
