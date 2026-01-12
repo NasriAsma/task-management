@@ -6,14 +6,10 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Role;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         $users = [
@@ -22,7 +18,24 @@ class UserSeeder extends Seeder
         ];
         
         foreach ($users as $userData) {
-            User::create($userData);
+            User::firstOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+        }
+
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin',
+                'password' => bcrypt('password'),
+                'is_2fa_enabled' => false,
+            ]
+        );
+        
+        $adminRole = Role::where('name', 'admin')->first();
+        if ($adminRole && !$admin->roles->contains($adminRole)) {
+            $admin->roles()->attach($adminRole);
         }
     }
 }

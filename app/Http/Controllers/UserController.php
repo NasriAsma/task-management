@@ -43,8 +43,7 @@ public function updateUser(Request $request, $id)
 {
     $user = User::find($id);
     if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    }
+        return response()->json(['message' => 'User not found'], 404);}
 
     $validatedData = $request->validate([
         'name' => 'sometimes|required|string|max:255',
@@ -63,6 +62,16 @@ public function updateUser(Request $request, $id)
         'user' => $user,
     ], 200);
 }
+
+
+public function store(request $request , $id)
+ {     $user =user::find($id) ;
+     if(!$user){
+    return response()->json (['message'=>'user not found'],404);
+            }
+            else {
+        return response()->json ( $user) ;}
+ }
 
 public function deleteUser($id)
 {

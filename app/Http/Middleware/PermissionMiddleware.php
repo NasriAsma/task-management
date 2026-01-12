@@ -16,6 +16,17 @@ class PermissionMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        return $next($request);
+     if (Auth::check()  )
+     {
+        $user = Auth::user();
+        $permission = $request->route()->parameter('permission');
+
+        if ($user->hasPermission($permission)) {
+            return $next($request);
+        } else {
+            return response()->json(['message' => 'authentication'], 403);
+        }
+     }
+    
     }
 }

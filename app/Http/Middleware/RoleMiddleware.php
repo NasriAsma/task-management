@@ -17,16 +17,15 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next):Response
     {
      if (Auth::check()  )
-     {
-        $user = Auth::user();
+     { $user = Auth::user();
         $role = $request->route()->parameter('role');
 
-        if ($user->hasRole($role==admin)) {
+        if ($user->hasRole($role)) {
             return $next($request);
         } else {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return response()->json(['message' => 'authentication'], 403);
         }
-     }
+     }  
 
     }
 }
