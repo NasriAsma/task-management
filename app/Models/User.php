@@ -44,6 +44,16 @@ class User extends Authenticatable
         return $this->roles()->where('name', $roleName)->exists(); 
     }
 
+    public function hasPermission($permissionName)
+    {
+        foreach ($this->roles as $role) {
+            if ($role->permissions()->where('name', $permissionName)->exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
