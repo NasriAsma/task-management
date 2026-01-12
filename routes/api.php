@@ -48,8 +48,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::get('/permissions', [PermissionController::class, 'index']);
     Route::post('/permissions', [PermissionController::class, 'store']);
     Route::post('/roles/{roleName}/permissions/{permissionName}', [PermissionController::class, 'givePermissionToRole']);
+    Route::post('/assign-role/{roleName}', [RoleController::class, 'assignRole']);
     });
 
 
+Route::middleware(['auth:sanctum', 'role:manager', 'permission:view_user' ])->group(function () {
+    Route::get('/users', [UserController::class,'index']);
+    
 
+});
 
