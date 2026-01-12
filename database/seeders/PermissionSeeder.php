@@ -16,6 +16,13 @@ class PermissionSeeder extends Seeder
             ['name' => 'edit_user', 'description' => 'Modifier un utilisateur'],
             ['name' => 'delete_user', 'description' => 'Supprimer un utilisateur'],
             ['name' => 'view_user', 'description' => 'Voir un utilisateur'],
+            ['name' => 'all', 'description' => 'Accès total'],
+            ['name' => 'create_task', 'description' => 'Créer une tâche'],
+            ['name' => 'edit_task', 'description' => 'Modifier une tâche'],
+            ['name' => 'delete_task', 'description' => 'Supprimer une tâche'],
+            ['name' => 'view_task', 'description' => 'Voir une tâche']
+            
+            
         ];
 
         foreach ($permissions as $data) {

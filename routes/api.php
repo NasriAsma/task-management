@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->get('/has-role/{roleName}', [App\Http\Control
 Route::middleware('auth:sanctum')->get('/get-roles', [App\Http\Controllers\RoleController::class, 'getRoles']);
 
 
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin', 'permission:all'])->group(function () {
     Route::post('/createUser', [UserController::class,'createUser']);
     Route::get('/users', [UserController::class,'index']);
     Route::put('/updateUser/{id}', [UserController::class,'updateUser']);
@@ -49,11 +49,13 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('/permissions', [PermissionController::class, 'store']);
     Route::post('/roles/{roleName}/permissions/{permissionName}', [PermissionController::class, 'givePermissionToRole']);
     Route::post('/assign-role/{roleName}', [RoleController::class, 'assignRole']);
+
     });
 
 
-Route::middleware(['auth:sanctum', 'role:manager', 'permission:view_user' ])->group(function () {
-    Route::get('/users', [UserController::class,'index']);
+Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
+    Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
+    
     
 
 });
