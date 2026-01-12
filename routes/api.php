@@ -49,14 +49,16 @@ Route::middleware(['auth:sanctum', 'role:admin', 'permission:all'])->group(funct
     Route::post('/permissions', [PermissionController::class, 'store']);
     Route::post('/roles/{roleName}/permissions/{permissionName}', [PermissionController::class, 'givePermissionToRole']);
     Route::post('/assign-role/{roleName}', [RoleController::class, 'assignRole']);
-
+    Route::put('/remove-role/{roleName}', [RoleController::class, 'removeRole']);
+    
     });
 
 
 Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
     Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
+    Route::middleware('permission:view_task')->post('/permissions', [UserController::class,'index']);
     
-    
-
 });
+
+
 

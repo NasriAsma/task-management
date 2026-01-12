@@ -51,6 +51,29 @@ public function getRoles(Request $request)
         'roles' => $roles
     ], 200);
 }
+ 
+
+public function removeRole(Request $request, $roleName)
+{
+    $user = $request->user();
+
+    $role = Role::where('name', $roleName)->first();
+    if (!$role) {
+        return response()->json(['message' => 'Role not found'], 404);
+    }
+
+    $user->roles()->detach($role->id);
+
+    return response()->json([
+        'message' => 'Role removed successfully',
+        'role' => $roleName,
+    ], 200);
+
+}
+
+ 
+
+
 
 
 }
