@@ -70,11 +70,13 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     });
 
 
-Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
-Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
 
-Route::middleware('permission:view_own_tasks')->get('/view_own_tasks/{id}', [tasksController::class, 'view_own_tasks']); 
-Route::middleware('permission:view_all_tasks')->pget('/permissions', [PermissionController::class, 'view_all_permissions']);  
+
+
+Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
+
+Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
+Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TasksController::class, 'viewTeamMemberTasks']);  
 });
 
 
