@@ -8,12 +8,9 @@ use App\Models\User;
 
 class RoleController extends Controller
 {
-    public function assignRole(Request $request, $roleName)
+    public function assignRole(Request $request, $roleName ,$id)
     {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
-        }
+        $user = User::findOrFail($id);
 
         $role = Role::where('name', $roleName)->first();
         if (!$role) {
@@ -27,6 +24,7 @@ class RoleController extends Controller
             'role' => $roleName,
         ], 200);
     }
+
 
     public function hasRole(Request $request, $roleName)
 {
@@ -53,9 +51,9 @@ public function getRoles(Request $request)
 }
  
 
-public function removeRole(Request $request, $roleName)
+public function removeRole (Request $request, $roleName, $id )
 {
-    $user = $request->user();
+    $user = User::findOrFail($id);
 
     $role = Role::where('name', $roleName)->first();
     if (!$role) {

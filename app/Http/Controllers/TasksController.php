@@ -3,29 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Tasks;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Permission;
+
 
 class TasksController extends Controller
 {
-     public function index(request $request)
+     public function view_all_tasks(Request $request)
      {  
          $user = $request->user();
          $tasks = $user->tasks; 
          return response()->json($tasks);   
      }
 
-     public function store(request $request)
-     {   $data=$request->validate([
+     public function store(Request $request, $id)
+
+     {
+         $data=$request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'due_date' => 'nullable|date',
-            'status' => ['pending', 'in_progress', 'completed'],
+            'status' => 'nullable|in:pending,in_progress,completed',
             'deadline' => 'nullable|date',
-            'priority' => ['low', 'medium', 'high'],
+            'priority' => 'nullable|in:low,medium,high',
             'assigned_to' => 'nullable|exists:users,id',
             'created_by' => 'exists:users,id',
         ]);
 
-        $user = $request->user();
+        $user = User::find($id);
 
         $task = $user->tasks()->create($data);
 
@@ -35,7 +42,9 @@ class TasksController extends Controller
         ], 201);
 
      }
-       public function show($id)
+
+
+       public function view_own_tasks ($id)
 {    $task=Task::find($id);
      if(!$task){
         return response()->json(['message'=>'Task not found'],404); }
@@ -69,7 +78,11 @@ class TasksController extends Controller
             ], 200);
         }
 
-        public function destroy($id)
+
+
+
+
+        public function destroy_any_task($id)
         {
             $task = Task::find($id);
             if (!$task) {
@@ -82,5 +95,46 @@ class TasksController extends Controller
                 'message' => 'Task deleted successfully',
             ], 200);
         }
-        
+
+
+
+
+public function assignTask(Request $request, $taskId, $userId)
+{
+    $task = Tasks::findOrFail($taskId);
+    $user = User::findOrFail($userId);
+
+    $task->assigned_to = $userId;
+    $task->save();
+
+    return response()->json([
+        'message' => 'Task assigned successfully',
+        'task' => $task,
+    ], 200);
+}
+
+public function viewTeamMemberTasks(Request $request, $userId)
+{
+    $manager = $request->user();
+    
+   
+    $tasks = Tasks::where('created_by', $manager->id)
+                   ->where('assigned_to', $userId)
+                   ->with(['assignee:id,name,email'])
+                   ->get();
+
+    if ($tasks->isEmpty()) {
+        return response()->json(['message' => 'Tasks not found'], 404);
+    }
+
+    $user = User::findOrFail($userId);
+
+    return response()->json([
+        'message' => 'Team member tasks retrieved successfully',
+        'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+        'tasks' => $tasks,
+        'total' => $tasks->count()
+    ], 200);
+}
+
 }

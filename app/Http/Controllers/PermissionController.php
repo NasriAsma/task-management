@@ -10,19 +10,23 @@ use App\Models\Role;
 
 class PermissionController extends Controller
 {  
+
+
 	public function index()
 	{
 		return response()->json(Permission::all());
 	}
+	
 
-	public function store(Request $request)
+
+	public function store(Request $request , $id)
 	{
 		$data = $request->validate([
 			'name' => 'required|string|max:255|unique:permissions,name',
 			'description' => 'nullable|string|max:255',
 		]);
-
-		$permission = Permission::create($data);
+        $user = User::find($id);
+		$permission = $user->Permission::create($data);
 
 		return response()->json([
 			'message' => 'Permission created successfully',
@@ -50,6 +54,15 @@ class PermissionController extends Controller
 			'permission' => $permissionName,
 		], 200);
 	}
+
+public function deletePermission(Request $request, $id)
+{      $permission =permission::findorfail($id);
+	 if($permission){
+		$permission->delete();
+		return response()->json(['message'=>'Permission deleted successfully'],200); }
+}
+
+
 
 
 

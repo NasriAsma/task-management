@@ -34,6 +34,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Tasks::class, 'assigned_to');
     }
+
     public function tasksCreated()
     {
         return $this->hasMany(Tasks::class, 'created_by');
@@ -41,8 +42,10 @@ class User extends Authenticatable
 
     public function hasRole($roleName)
     {
-        return $this->roles()->where('name', $roleName)->exists(); 
+        return 
+        $this->roles()->where('name', $roleName)->exists(); 
     }
+
 
     public function hasPermission($permissionName)
     {

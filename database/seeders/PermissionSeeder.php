@@ -20,9 +20,9 @@ class PermissionSeeder extends Seeder
             ['name' => 'create_task', 'description' => 'Créer une tâche'],
             ['name' => 'edit_task', 'description' => 'Modifier une tâche'],
             ['name' => 'delete_task', 'description' => 'Supprimer une tâche'],
-            ['name' => 'view_task', 'description' => 'Voir une tâche']
-            
-            
+            ['name' => 'view_task', 'description' => 'Voir une tâche'],
+            ['name' => 'manage_team_tasks', 'description' => 'Gérer les tâches de l\'équipe'],
+            ['name' => 'assign_task', 'description' => 'Assigner une tâche'],
         ];
 
         foreach ($permissions as $data) {
@@ -32,9 +32,26 @@ class PermissionSeeder extends Seeder
             );
         }
         
+       
         $admin = Role::where('name', 'admin')->first();
         if ($admin) {
             $admin->permissions()->sync(Permission::all());
         }
+
+
+        $manager = Role::where('name', 'manager')->first();
+        if ($manager) {
+            $managerPermissions = Permission::whereIn('name', [
+                'view_user',
+                'view_task',
+                'create_team_task',
+                'edit_team_task',
+                'delete_team_task',
+                'assign_task'
+            ])->get();
+            $manager->permissions()->sync($managerPermissions);
+        } 
+
     }
+    
 }

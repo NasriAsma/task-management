@@ -14,25 +14,13 @@ class UserSeeder extends Seeder
     {
         $users = [
             ['name' => 'sou', 'email' => 'sou@exemple.com', 'password' => Hash::make('sou12'), 'is_2fa_enabled' => false],
-            ['name' => 'sli', 'email' => 'sli@exemple.com', 'password' => Hash::make('sli12'), 'is_2fa_enabled' => false]
-        ];
+            ['name' => 'sli', 'email' => 'sli@exemple.com', 'password' => Hash::make('sli12'), 'is_2fa_enabled' => false],
+            ['name' => 'Admin','email' => 'admin@example.com','password' => Hash::make('password'),'is_2fa_enabled' => false ]
         
-        foreach ($users as $userData) {
-            User::firstOrCreate(
-                ['email' => $userData['email']],
-                $userData
-            );
-        }
+            ];
+        
+       
 
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Admin',
-                'password' => bcrypt('password'),
-                'is_2fa_enabled' => false,
-            ]
-        );
-        
         $adminRole = Role::where('name', 'admin')->first();
         if ($adminRole && !$admin->roles->contains($adminRole)) {
             $admin->roles()->attach($adminRole);

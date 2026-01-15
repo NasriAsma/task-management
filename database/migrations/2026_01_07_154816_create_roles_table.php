@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
-            $table->enum('name', ['admin', 'employe', 'emploi'])->unique();
+            $table->enum('name', ['admin', 'manager', 'employe', 'emploi'])->unique();
             $table->string('description')->nullable();
             $table->timestamps();
         });
