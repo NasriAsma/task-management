@@ -138,7 +138,126 @@ public function viewTeamMemberTasks(Request $request, $userId)
 }
 
 
+public function view_task_details($id)
+{
+    $task = Tasks::with(['creator:id,name,email', 'assignee:id,name,email'])->find($id);
+
+    if (!$task) {
+        return response()->json(['message' => 'Task not found'], 404);
+    }
+
+    return response()->json([
+        'task' => $task,
+        'created_by' => [
+            'id' => $task->creator->id,
+            'name' => $task->creator->name,
+            'email' => $task->creator->email,
+        ],
+        'assigned_to' => [
+            'id' => $task->assignee->id,
+            'name' => $task->assignee->name,
+            'email' => $task->assignee->email,
+        ],
+    ], 200);
+}
+
+
+
+public function update_team_task(request $request, $id, $userId)
+{  $manager = $request->user();
+    
+   
+    $tasks = Tasks::where('created_by', $manager->id)
+                   ->where('assigned_to', $userId)
+                   ->with(['assignee:id,name,email'])
+                   ->findorfail($id);
+
+         $data=$request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'due_date' => 'sometimes|nullable|date',
+            'status' => 'sometimes|in:pending,in_progress,completed',
+            'deadline' => 'sometimes|nullable|date',
+            'priority' => 'sometimes|in:low,medium,high',
+            'assigned_to' => 'sometimes|nullable|exists:users,id',
+        ]);
+
+        $task->update($data);
+
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'task' => $task,
+        ], 200);
+}
+
+public function delete_team_task(Request $request, $userId, $id)
+{
+    $manager = $request->user();
+    
+   
+    $tasks = Tasks::where('created_by', $manager->id)
+                   ->where('assigned_to', $userId)
+                   ->with(['assignee:id,name,email'])
+                   ->findorfail($id);
+
+
+    $task->delete();
+    
+    return response()->json([
+        'message' => 'Task deleted successfully',
+    ], 200);
+
 
 
 
 }
+
+public function create_team_task (request $request ,$id, $userId)
+{
+    $manager = $request->user();
+    
+   
+    $tasks = Tasks::where('created_by', $manager->id)
+                   ->where('assigned_to', $userId)
+                   ->with(['assignee:id,name,email'])
+                   ->findorfail($id);
+
+    $data=$request->validate([
+       'title' => 'required|string|max:255',
+       'description' => 'nullable|string',
+       'due_date' => 'nullable|date',
+       'status' => 'nullable|in:pending,in_progress,completed',
+       'deadline' => 'nullable|date',
+       'priority' => 'nullable|in:low,medium,high',
+       'assigned_to' => 'nullable|exists:users,id',
+       'created_by' => 'exists:users,id',
+   ]);
+
+   $task = $user->tasks()->create($data);
+
+   return response()->json([
+       'message' => 'Task created successfully',
+       'task' => $task,
+   ], 201);
+
+}
+
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -61,7 +61,7 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:delete_role')->put('/remove-role/{roleName}/{id}', [RoleController::class, 'removeRole']);
    
    
-   
+    Route::middleware('permission:view_task_details')->get('/view_task_details/{id}', [tasksController::class, 'view_task_details']);
     Route::middleware('permission:view_task')->get('/get-tasks', [tasksController::class, 'view_all_tasks']);
     Route::middleware('permission:view_own_tasks')->get('/view_own_tasks/{id}', [tasksController::class, 'view_own_tasks']);
     Route::middleware('permission:create_task')->post('/create-task/{id}', [tasksController::class, 'store']);
@@ -74,10 +74,14 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
 
 
 Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
-
+Route::middleware('permission:update_team_task')->put('/update-team-task/{userId}/{id}', [tasksController::class, 'update_team_task']);
 Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
+Route::middleware('permission:create_team_task')->post('/create-team-task/{userId}/{id}', [tasksController::class, 'create_team_task']);
+Route::middleware('permission:delete_team_task')->delete('/delete-team-task/{userId}/{id}', [tasksController::class, 'delete_team_task']);
 Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TasksController::class, 'viewTeamMemberTasks']);  
 });
+
+
 
 
 
