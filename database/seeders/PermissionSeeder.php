@@ -65,9 +65,8 @@ class PermissionSeeder extends Seeder
         $employe = Role::where('name', 'employe')->first();
         if ($employe) {
             $employePermissions = Permission::whereIn('name', [
-                'view_task',
-                'view_own_tasks',
-                'update_task_status',
+                'view_task_for_user',
+                'update_task_status'
             ])->get();
             
             $employe->permissions()->sync($employePermissions);

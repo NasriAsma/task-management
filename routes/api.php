@@ -82,6 +82,13 @@ Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [Ta
 });
 
 
+Route::middleware(['auth:sanctum', 'role:employe' ])->group(function () {
+Route::middleware('permission:view_task_for_user')->get('/view_task_for_user/{userId}/{taskId}', [tasksController::class, 'view_task_for_user']);
+Route::middleware('permission:update_task_status')->put('/update_task_status/{id}', [tasks
+Controller::class, 'update_task_status']);
+});
+
+
 
 
 

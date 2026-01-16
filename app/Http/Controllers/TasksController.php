@@ -45,7 +45,7 @@ class TasksController extends Controller
 
 
        public function view_own_tasks ($id)
-{    $task=Task::find($id);
+{    $task = Tasks::find($id);
      if(!$task){
         return response()->json(['message'=>'Task not found'],404); }
         else {
@@ -55,7 +55,7 @@ class TasksController extends Controller
 
         public function update(Request $request, $id)
         {
-            $task = Task::find($id);
+            $task = Tasks::find($id);
             if (!$task) {
                 return response()->json(['message' => 'Task not found'], 404);
             }
@@ -84,7 +84,7 @@ class TasksController extends Controller
 
         public function destroy_any_task($id)
         {
-            $task = Task::find($id);
+            $task = Tasks::find($id);
             if (!$task) {
                 return response()->json(['message' => 'Task not found'], 404);
             }
@@ -163,88 +163,131 @@ public function view_task_details($id)
 
 
 
-public function update_team_task(request $request, $id, $userId)
-{  $manager = $request->user();
+public function update_team_task(Request $request, $id, $userId)
+{  
+    $manager = $request->user();
     
-   
-    $tasks = Tasks::where('created_by', $manager->id)
-                   ->where('assigned_to', $userId)
-                   ->with(['assignee:id,name,email'])
-                   ->findorfail($id);
+    $task = Tasks::where('created_by', $manager->id)
+                  ->where('assigned_to', $userId)
+                  ->findOrFail($id);
 
-         $data=$request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|nullable|string',
-            'due_date' => 'sometimes|nullable|date',
-            'status' => 'sometimes|in:pending,in_progress,completed',
-            'deadline' => 'sometimes|nullable|date',
-            'priority' => 'sometimes|in:low,medium,high',
-            'assigned_to' => 'sometimes|nullable|exists:users,id',
-        ]);
+    $data = $request->validate([
+        'title' => 'sometimes|required|string|max:255',
+        'description' => 'sometimes|nullable|string',
+        'due_date' => 'sometimes|nullable|date',
+        'status' => 'sometimes|in:pending,in_progress,completed',
+        'deadline' => 'sometimes|nullable|date',
+        'priority' => 'sometimes|in:low,medium,high',
+        'assigned_to' => 'sometimes|nullable|exists:users,id',
+    ]);
 
-        $task->update($data);
+    $task->update($data);
 
-        return response()->json([
-            'message' => 'Task updated successfully',
-            'task' => $task,
-        ], 200);
+    return response()->json([
+        'message' => 'Task updated successfully',
+        'task' => $task,
+    ], 200);
 }
 
 public function delete_team_task(Request $request, $userId, $id)
 {
     $manager = $request->user();
     
-   
-    $tasks = Tasks::where('created_by', $manager->id)
-                   ->where('assigned_to', $userId)
-                   ->with(['assignee:id,name,email'])
-                   ->findorfail($id);
-
+    $task = Tasks::where('created_by', $manager->id)
+                  ->where('assigned_to', $userId)
+                  ->findOrFail($id);
 
     $task->delete();
     
     return response()->json([
         'message' => 'Task deleted successfully',
     ], 200);
-
-
-
-
 }
 
-public function create_team_task (request $request ,$id, $userId)
+public function create_team_task(Request $request, $id, $userId)
 {
     $manager = $request->user();
     
-   
-    $tasks = Tasks::where('created_by', $manager->id)
-                   ->where('assigned_to', $userId)
-                   ->with(['assignee:id,name,email'])
-                   ->findorfail($id);
+    $user = User::findOrFail($id);
 
-    $data=$request->validate([
-       'title' => 'required|string|max:255',
-       'description' => 'nullable|string',
-       'due_date' => 'nullable|date',
-       'status' => 'nullable|in:pending,in_progress,completed',
-       'deadline' => 'nullable|date',
-       'priority' => 'nullable|in:low,medium,high',
-       'assigned_to' => 'nullable|exists:users,id',
-       'created_by' => 'exists:users,id',
-   ]);
+    $data = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'due_date' => 'nullable|date',
+        'status' => 'nullable|in:pending,in_progress,completed',
+        'deadline' => 'nullable|date',
+        'priority' => 'nullable|in:low,medium,high',
+        'assigned_to' => 'nullable|exists:users,id',
+        'created_by' => 'exists:users,id',
+    ]);
 
-   $task = $user->tasks()->create($data);
+    $task = $user->tasksAssigned()->create($data);
 
-   return response()->json([
-       'message' => 'Task created successfully',
-       'task' => $task,
-   ], 201);
+    return response()->json([
+        'message' => 'Task created successfully',
+        'task' => $task,
+    ], 201);
+}
 
+public function view_own_task_for_user(Request $request, $userId, $taskId)
+{
+    $user = User::findOrFail($userId);
+    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+    
+
+    return response()->json([
+        'task' => $task,
+    ], 200);
+}
+
+
+public function view_all_tasks_for_user(Request $request, $userId)
+{
+    $user = User::findOrFail($userId);
+    $tasks = $user->tasks;
+
+    return response()->json([
+        'tasks' => $tasks,
+    ], 200);
 }
 
 
 
 
+
+public function view_task_for_user (Request $request, $userId, $taskId)
+{   $user=$request->user();
+    $user = User::findOrFail($userId);
+    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+    
+
+    return response()->json([
+        'task' => $task,
+    ], 200);
+}
+
+
+public function update_task_status (Request $request, $userId, $taskId)
+{
+    $user = User::findOrFail($userId);
+    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+
+    if (!$task) {
+        return response()->json(['message' => 'Task not found'], 404);
+    }
+
+    $data = $request->validate([
+        'status' => 'required|in:pending,in_progress,completed',
+    ]);
+
+    $task->status = $data['status'];
+    $task->save();
+
+    return response()->json([
+        'message' => 'Task status updated successfully',
+        'task' => $task,
+    ], 200);
+}
 
 
 
