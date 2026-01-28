@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\tasksController;
+use App\Http\Controllers\AuditController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -50,7 +51,17 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:delete_user')->delete('/deleteUser/{id}', [UserController::class,'deleteUser']);
     Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
     Route::middleware('permission:view_user_par_id')->get('/user/{id}', [UserController::class,'getUser']);
-  
+    Route::middleware('permission:active_compte')->post('/active_compte/{id}', [UserController::class, 'activeCompte']);
+    Route::middleware('permission:desactive_compte')->put('/desactive_compte/{id}', [UserController::class, 'desactiveCompte']);
+
+    // Routes pour consulter les audits (journal d'activité)
+    Route::get('/audits', [AuditController::class, 'index']);
+    Route::get('/audits/{id}', [AuditController::class, 'show']);
+    Route::get('/audits/user/{userId}', [AuditController::class, 'getUserAudits']);
+    Route::get('/audits/by-user/{userId}', [AuditController::class, 'getAuditsByUser']);
+
+
+
     Route::middleware('permission:view_all_permission')->get('/permissions', [PermissionController::class, 'view_all_permissions']);
     Route::middleware('permission:create_permission')->post('/create_permission', [PermissionController::class, 'view_own_tasks']);
     Route::middleware('permission:delete_permission')->delete('/delete_permission/{id}', [PermissionController::class, 'deletePermission']);

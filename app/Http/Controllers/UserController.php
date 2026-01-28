@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Spatie\Activitylog\Models\Activity;
 
 
 class UserController extends Controller
@@ -22,6 +23,12 @@ class UserController extends Controller
             'email' => $valida['email'],
             'password' => bcrypt($valida['password']),
         ]);
+
+        // Enregistrer l'activité
+        activity()
+            ->performedOn($user)
+            ->causedBy($request->user())
+            ->log('Nouvel utilisateur créé');
 
         return response()->json([
             'message' => 'User created successfully',
@@ -80,6 +87,12 @@ public function deleteUser($id)
         return response()->json(['message' => 'User not found'], 404);
     }
 
+    // Enregistrer l'activité avant la suppression
+    activity()
+        ->performedOn($user)
+        ->causedBy(request()->user())
+        ->log('Utilisateur supprimé');
+
     $user->delete();
 
     return response()->json(['message' => 'User deleted successfully'], 200);
@@ -94,5 +107,44 @@ public function getUser($id)
     } else {
         return response()->json($user, 200);
     }
+
+}
+
+public function desactiveCompte($id)
+{
+    $user = User::find($id);
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $user->is_active = false;
+    $user->save();
+
+    // Enregistrer l'activité
+    activity()
+        ->performedOn($user)
+        ->causedBy(request()->user())
+        ->log('Compte utilisateur désactivé');
+
+    return response()->json(['message' => 'User account deactivated successfully'], 200);
+
+}
+
+public function activeCompte($id)
+{
+    $user = User::find($id);
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $user->is_active = true;
+    $user->save();
+
+    return response()->json(['message' => 'User account activated successfully'], 200);
+
+}
+
+
+
 
 }

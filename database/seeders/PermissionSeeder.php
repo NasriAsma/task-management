@@ -31,7 +31,10 @@ class PermissionSeeder extends Seeder
             ['name' => 'create_team_tasks', 'description' => 'Gérer les tâches de l\'équipe'],
             ['name' => 'view_own_tasks', 'description' => 'Voir ses propres tâches'],
             ['name' => 'update_task_status', 'description' => 'Mettre à jour le statut d\'une tâche'],
-            
+            ['name' =>'active_compte', 'description' => 'Activer un compte utilisateur'],
+            ['name' =>'desactive_compte', 'description' => 'Désactiver un compte utilisateur'],
+
+         
       
             ['name' => 'all', 'description' => 'Accès total'],
         ];
