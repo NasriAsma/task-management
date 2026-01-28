@@ -43,24 +43,25 @@ Route::middleware('auth:sanctum')->get('/get-roles', [RoleController::class, 'ge
 
 
 
+
 Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:create_user')->post('/createUser', [UserController::class,'createUser']);
     Route::middleware('permission:update_user')->put('/updateUser/{id}', [UserController::class,'updateUser']);
     Route::middleware('permission:delete_user')->delete('/deleteUser/{id}', [UserController::class,'deleteUser']);
     Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
-  
+    Route::middleware('permission:view_user_par_id')->get('/user/{id}', [UserController::class,'getUser']);
   
     Route::middleware('permission:view_all_permission')->get('/permissions', [PermissionController::class, 'view_all_permissions']);
     Route::middleware('permission:create_permission')->post('/create_permission', [PermissionController::class, 'view_own_tasks']);
     Route::middleware('permission:delete_permission')->delete('/delete_permission/{id}', [PermissionController::class, 'deletePermission']);
     Route::middleware('permission:update_permission')->put('/update_permission', [PermissionController::class, 'store']);
-    Route::middleware('permission:assign_task')->post('/assign-task/{taskId}/{userId}', [tasksController::class, 'assignTask']);
-  
+    
+    
   
     Route::middleware('permission:assign_role')->post('/assign-role/{roleName}/{id}', [RoleController::class, 'assignRole']);
     Route::middleware('permission:delete_role')->put('/remove-role/{roleName}/{id}', [RoleController::class, 'removeRole']);
    
-   
+    Route::middleware('permission:assign_task')->post('/assign-task/{taskId}/{userId}', [tasksController::class, 'assignTask']);
     Route::middleware('permission:view_task_details')->get('/view_task_details/{id}', [tasksController::class, 'view_task_details']);
     Route::middleware('permission:view_task')->get('/get-tasks', [tasksController::class, 'view_all_tasks']);
     Route::middleware('permission:view_own_tasks')->get('/view_own_tasks/{id}', [tasksController::class, 'view_own_tasks']);

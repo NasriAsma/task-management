@@ -17,6 +17,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'edit_user', 'description' => 'Modifier un utilisateur'],
             ['name' => 'delete_user', 'description' => 'Supprimer un utilisateur'],
             ['name' => 'view_user', 'description' => 'Voir un utilisateur'],
+            ['name' => 'view_user_for_user', 'description' => 'Voir les utilisateurs'],
+
         
             ['name' => 'create_task', 'description' => 'Créer une tâche'],
             ['name' => 'edit_task', 'description' => 'Modifier une tâche'],

@@ -18,8 +18,8 @@ class UserSeeder extends Seeder
 
         // Admin
         $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            ['name' => 'Admin', 'password' => Hash::make('password'), 'is_2fa_enabled' => false]
+            ['email' => 'nasriasma91@gmail.com'],
+            ['name' => 'Admin', 'password' => Hash::make('asma12'), 'is_2fa_enabled' => false]
         );
         if ($adminRole && !$admin->roles->contains($adminRole)) {
             $admin->roles()->attach($adminRole->id);
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
         // Manager
         $manager = User::firstOrCreate(
             ['email' => 'manager@example.com'],
-            ['name' => 'Manager', 'password' => Hash::make('password'), 'is_2fa_enabled' => false]
+            ['name' => 'Manager', 'password' => Hash::make('manager12'), 'is_2fa_enabled' => false]
         );
         if ($managerRole && !$manager->roles->contains($managerRole)) {
             $manager->roles()->attach($managerRole->id);
