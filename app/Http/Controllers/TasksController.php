@@ -14,7 +14,8 @@ class TasksController extends Controller
      public function view_all_tasks(Request $request)
      {  
          $user = $request->user();
-         $tasks = $user->tasks; 
+         $perPage = (int) $request->query('per_page', 15);
+         $tasks = $user->tasks()->paginate($perPage);
          return response()->json($tasks);   
      }
 
@@ -118,10 +119,11 @@ public function viewTeamMemberTasks(Request $request, $userId)
     $manager = $request->user();
     
    
+    $perPage = (int) $request->query('per_page', 15);
     $tasks = Tasks::where('created_by', $manager->id)
                    ->where('assigned_to', $userId)
                    ->with(['assignee:id,name,email'])
-                   ->get();
+                   ->paginate($perPage);
 
     if ($tasks->isEmpty()) {
         return response()->json(['message' => 'Tasks not found'], 404);
@@ -133,7 +135,7 @@ public function viewTeamMemberTasks(Request $request, $userId)
         'message' => 'Team member tasks retrieved successfully',
         'user' => ['id' => $user->id, 'name' => $user->name, 'email' => $user->email],
         'tasks' => $tasks,
-        'total' => $tasks->count()
+        'total' => $tasks->total()
     ], 200);
 }
 
@@ -244,7 +246,8 @@ public function view_own_task_for_user(Request $request, $userId, $taskId)
 public function view_all_tasks_for_user(Request $request, $userId)
 {
     $user = User::findOrFail($userId);
-    $tasks = $user->tasks;
+    $perPage = (int) $request->query('per_page', 15);
+    $tasks = $user->tasks()->paginate($perPage);
 
     return response()->json([
         'tasks' => $tasks,

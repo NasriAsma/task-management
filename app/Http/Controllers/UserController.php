@@ -38,9 +38,10 @@ class UserController extends Controller
 
 
 
-public function index()
+public function index(Request $request)
 {
-    $users = User::all();
+    $perPage = (int) $request->query('per_page', 15);
+    $users = User::paginate($perPage);
     return response()->json($users);
 
 }

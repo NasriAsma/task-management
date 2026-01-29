@@ -12,9 +12,10 @@ class PermissionController extends Controller
 {  
 
 
-	public function index()
+	public function index(Request $request)
 	{
-		return response()->json(Permission::all());
+		$perPage = (int) $request->query('per_page', 15);
+		return response()->json(Permission::paginate($perPage));
 	}
 	
 
