@@ -292,6 +292,26 @@ public function update_task_status (Request $request, $userId, $taskId)
     ], 200);
 }
 
+public function getNumberGlobaleofTasks()
+{
+    $count = Tasks::count();
+    return response()->json(['number_of_tasks' => $count], 200);
+
+
+
+}
+
+public function getNumberTaskforUser($userId)
+{
+    $count = Tasks::where('assigned_to', $userId)->count();
+    return response()->json(['number_of_tasks_for_user' => $count], 200);
+}
+
+
+public function getNumberTaskTeamforUser($userId, Request $request)
+{   $manager = $request->user();
+    $count = Tasks::where('assigned_to', $userId)->where('created_by', $manager->id)->count();
+    return response()->json(['number_of_team_tasks_for_user' => $count], 200);
 
 
 
@@ -299,11 +319,23 @@ public function update_task_status (Request $request, $userId, $taskId)
 
 
 
+public function getStatistiquetask ()
+{
+    $totalTasks = Tasks::count();
+    $completedTasks = Tasks::where('status', 'completed')->count();
+    $pendingTasks = Tasks::where('status', 'pending')->count();
+    $inProgressTasks = Tasks::where('status', 'in_progress')->count();
+
+    return response()->json([
+        'total_tasks' => $totalTasks,
+        'completed_tasks' => $completedTasks,
+        'pending_tasks' => $pendingTasks,
+        'in_progress_tasks' => $inProgressTasks,
+    ], 200);
 
 
 
 
 
-
-
+}
 

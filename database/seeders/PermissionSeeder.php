@@ -19,7 +19,14 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_user', 'description' => 'Voir un utilisateur'],
             ['name' => 'view_user_for_user', 'description' => 'Voir les utilisateurs'],
             ['name' => 'view_audits', 'description' => 'Voir les audits'],
-        
+            
+            ['name' => 'view_statistique_user', 'description' => 'Voir les statistiques des utilisateurs'],
+            ['name' => 'view_statistique_task', 'description' => 'voir les statistiques des tâches'],
+
+            ['name' => 'view_all_Number_of_user', 'description' => 'Voir les numbres d\'utilisateurs'],
+            ['name' => 'view_all_Number_of_task', 'description' => 'Voir les nombres de tâches'],
+            ['name' => 'view_Number_of_task_for_user', 'description' => 'Voir le nombre de tâches pour un utilisateur'],
+            ['name' => 'view_Number_of_team_tasks_for_user', 'description' => 'Voir le nombre de tâches d\'équipe pour un utilisateur'],
             ['name' => 'create_task', 'description' => 'Créer une tâche'],
             ['name' => 'edit_task', 'description' => 'Modifier une tâche'],
             ['name' => 'delete_task', 'description' => 'Supprimer une tâche'],
@@ -62,6 +69,7 @@ class PermissionSeeder extends Seeder
                 'delete_task',
                 'assign_task',
                 'manage_team_tasks',
+                'view_Number_of_team_tasks_for_use' 
             ])->get();
             
             $manager->permissions()->sync($managerPermissions);

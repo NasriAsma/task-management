@@ -54,15 +54,20 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:active_compte')->post('/active_compte/{id}', [UserController::class, 'activeCompte']);
     Route::middleware('permission:desactive_compte')->put('/desactive_compte/{id}', [UserController::class, 'desactiveCompte']);
 
-  Route::middleware(['permission:view_audits', 'api.audit'])->get('/user/{user}/audits', [AuditController::class, 'getUserAudits']);
+    Route::middleware(['permission:view_audits', 'api.audit'])->get('/user/{user}/audits', [AuditController::class, 'getUserAudits']);
 
 
     Route::middleware('permission:view_all_permission')->get('/permissions', [PermissionController::class, 'view_all_permissions']);
     Route::middleware('permission:create_permission')->post('/create_permission', [PermissionController::class, 'view_own_tasks']);
     Route::middleware('permission:delete_permission')->delete('/delete_permission/{id}', [PermissionController::class, 'deletePermission']);
     Route::middleware('permission:update_permission')->put('/update_permission', [PermissionController::class, 'store']);
-    
-    
+    Route::middleware('permission:view_statistique_task')->get('/statistique-task', [TasksController::class, 'getStatistiquetask']);
+    Route::middleware('permission:view_statistique_user')->get('/statistique-user', [UserController::class, 'getStatistiqueUser']);
+    Route::middleware('permission:view_all_Number_of_user')->get('/number-of-users', [UserController::class, 'getNumberTasksPerUser']);
+    Route::middleware('permission:view_all_Number_of_task')->get('/number-of-tasks', [TasksController::class, 'getNumberGlobaleofTasks']);
+    Route::middleware('permission:view_Number_of_task_for_user')->get('/number-of-tasks-for-user/{userId}', [TasksController::class, 'getNumberTaskforUser']);
+   
+
   
     Route::middleware('permission:assign_role')->post('/assign-role/{roleName}/{id}', [RoleController::class, 'assignRole']);
     Route::middleware('permission:delete_role')->put('/remove-role/{roleName}/{id}', [RoleController::class, 'removeRole']);
@@ -86,6 +91,9 @@ Route::middleware('permission:view_user')->get('/users', [UserController::class,
 Route::middleware('permission:create_team_task')->post('/create-team-task/{userId}/{id}', [tasksController::class, 'create_team_task']);
 Route::middleware('permission:delete_team_task')->delete('/delete-team-task/{userId}/{id}', [tasksController::class, 'delete_team_task']);
 Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TasksController::class, 'viewTeamMemberTasks']);  
+Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/count-team-tasks/{userId}', [TasksController::class, 'getNumberTaskTeamforUser']);
+
+
 });
 
 

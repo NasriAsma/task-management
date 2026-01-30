@@ -146,6 +146,25 @@ public function activeCompte($id)
 }
 
 
+public function getNumberofUsers()
+{
+    $count = User::count();
+    return response()->json(['number_of_users' => $count], 200);
 
 
+}
+
+public function getStatistiqueUser()
+{
+   
+  $statistique = [  'total_users' =>  $totalUsers = User::count() ,
+            'active_users' => $activeUsers = User::where('is_active', true)->count() ,
+             'inactive_users' =>  $inactiveUsers = User::where('is_active', false)->count() ];
+
+
+    return response()->json([
+           'statistique' => $statistique,
+       ], 200);
+
+}
 }
