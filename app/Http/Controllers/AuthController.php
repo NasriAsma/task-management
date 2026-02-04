@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\user;
-use Illuminate\Support\Facades\hash;
-use Illuminate\Support\Facades\auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Response;
 use OpenApi\Annotations as OA;
@@ -13,6 +13,7 @@ use OpenApi\Generator;
 use OpenApi\Annotations\Info;
 use App\Mail\testmail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 
 /**
@@ -77,18 +78,18 @@ public function login(Request $request)
 
     $user = User::where('email', $request->email)->firstOrFail();
 
-    // Si 2FA n'est pas activée, on renvoie directement le token
-    if ($user->is_2fa_enabled==0) {
+    // // Si 2FA n'est pas activée, on renvoie directement le token
+    // if ($user->is_2fa_enabled==0) {
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'message'      => 'successfully',
             'user'         => $user,
             'access_token' => $token,
         ], 200);
-    }
+    // }
 
     // 2FA activée: générer et envoyer le code, puis exiger vérification
-    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    /* $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     $user->code_2FA = $code;
     $user->code_2FA_expiry = now()->addMinutes(5);
     $user->save();
@@ -102,7 +103,18 @@ public function login(Request $request)
     return response()->json([
         'requires_2fa' => true,
         'message'      => 'Code envoyé par email'
-    ], 200);
+    ], 200); */
+
+    // Pour le test : Log au lieu de Mail
+    /*
+    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    $user->code_2FA = $code;
+    $user->code_2FA_expiry = now()->addMinutes(5);
+    $user->save();
+    Log::info("Code 2FA Login : {$code} pour {$user->email}");
+    Auth::logout();
+    return response()->json(['requires_2fa' => true, 'message' => 'Code envoyé (voir logs)'], 200);
+    */
 }
 
 
@@ -177,13 +189,17 @@ public function register( request $request )
     'email'=>'required|email|unique:users,email',
     'password'=>'required|string|confirmed|min:6'
 ]);
-      $user= user ::create ([
+      $user= User ::create ([
     'name'=>$request -> name ,
     'email'=>$request -> email,
-    'password'=>hash::make ($request->password) 
+    'password'=>Hash::make ($request->password) 
     ]);
 
-Mail::to($user->email)->send(new testmail());
+// try {
+//     Mail::to($user->email)->send(new testmail());
+// } catch (\Exception $e) {
+//     // Log error or ignore if mail fails, but don't block registration
+// }
       return response()->json ([
     'message'=>'user registered successfully',
     'user'=>$user

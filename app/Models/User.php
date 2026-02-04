@@ -11,8 +11,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 
 class User extends Authenticatable implements Auditable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-    use \OwenIt\Auditing\Auditable;
+    use HasApiTokens, HasFactory, Notifiable, \OwenIt\Auditing\Auditable;
 
     /**
      * The attributes that are mass assignable.
@@ -34,12 +33,12 @@ class User extends Authenticatable implements Auditable
     }
     public function tasksAssigned()
     {
-        return $this->hasMany(Tasks::class, 'assigned_to');
+        return $this->hasMany(Task::class, 'assigned_to');
     }
 
     public function tasksCreated()
     {
-        return $this->hasMany(Tasks::class, 'created_by');
+        return $this->hasMany(Task::class, 'created_by');
     }
 
     public function hasRole($roleName)

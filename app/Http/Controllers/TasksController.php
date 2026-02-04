@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tasks;
+use App\Models\Task;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permission;
@@ -46,7 +46,7 @@ class TasksController extends Controller
 
 
        public function view_own_tasks ($id)
-{    $task = Tasks::find($id);
+{    $task = Task::find($id);
      if(!$task){
         return response()->json(['message'=>'Task not found'],404); }
         else {
@@ -56,7 +56,7 @@ class TasksController extends Controller
 
         public function update(Request $request, $id)
         {
-            $task = Tasks::find($id);
+            $task = Task::find($id);
             if (!$task) {
                 return response()->json(['message' => 'Task not found'], 404);
             }
@@ -85,7 +85,7 @@ class TasksController extends Controller
 
         public function destroy_any_task($id)
         {
-            $task = Tasks::find($id);
+            $task = Task::find($id);
             if (!$task) {
                 return response()->json(['message' => 'Task not found'], 404);
             }
@@ -102,7 +102,7 @@ class TasksController extends Controller
 
 public function assignTask(Request $request, $taskId, $userId)
 {
-    $task = Tasks::findOrFail($taskId);
+    $task = Task::findOrFail($taskId);
     $user = User::findOrFail($userId);
 
     $task->assigned_to = $userId;
@@ -120,7 +120,7 @@ public function viewTeamMemberTasks(Request $request, $userId)
     
    
     $perPage = (int) $request->query('per_page', 15);
-    $tasks = Tasks::where('created_by', $manager->id)
+    $tasks = Task::where('created_by', $manager->id)
                    ->where('assigned_to', $userId)
                    ->with(['assignee:id,name,email'])
                    ->paginate($perPage);
@@ -142,7 +142,7 @@ public function viewTeamMemberTasks(Request $request, $userId)
 
 public function view_task_details($id)
 {
-    $task = Tasks::with(['creator:id,name,email', 'assignee:id,name,email'])->find($id);
+    $task = Task::with(['creator:id,name,email', 'assignee:id,name,email'])->find($id);
 
     if (!$task) {
         return response()->json(['message' => 'Task not found'], 404);
@@ -169,7 +169,7 @@ public function update_team_task(Request $request, $id, $userId)
 {  
     $manager = $request->user();
     
-    $task = Tasks::where('created_by', $manager->id)
+    $task = Task::where('created_by', $manager->id)
                   ->where('assigned_to', $userId)
                   ->findOrFail($id);
 
@@ -195,7 +195,7 @@ public function delete_team_task(Request $request, $userId, $id)
 {
     $manager = $request->user();
     
-    $task = Tasks::where('created_by', $manager->id)
+    $task = Task::where('created_by', $manager->id)
                   ->where('assigned_to', $userId)
                   ->findOrFail($id);
 
@@ -234,7 +234,7 @@ public function create_team_task(Request $request, $id, $userId)
 public function view_own_task_for_user(Request $request, $userId, $taskId)
 {
     $user = User::findOrFail($userId);
-    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+    $task = Task::where('assigned_to', $userId)->where('id', $taskId)->first();
     
 
     return response()->json([
@@ -261,7 +261,7 @@ public function view_all_tasks_for_user(Request $request, $userId)
 public function view_task_for_user (Request $request, $userId, $taskId)
 {   $user=$request->user();
     $user = User::findOrFail($userId);
-    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+    $task = Task::where('assigned_to', $userId)->where('id', $taskId)->first();
     
 
     return response()->json([
@@ -273,7 +273,7 @@ public function view_task_for_user (Request $request, $userId, $taskId)
 public function update_task_status (Request $request, $userId, $taskId)
 {
     $user = User::findOrFail($userId);
-    $task = Tasks::where('assigned_to', $userId)->where('id', $taskId)->first();
+    $task = Task::where('assigned_to', $userId)->where('id', $taskId)->first();
 
     if (!$task) {
         return response()->json(['message' => 'Task not found'], 404);
@@ -294,7 +294,7 @@ public function update_task_status (Request $request, $userId, $taskId)
 
 public function getNumberGlobaleofTasks()
 {
-    $count = Tasks::count();
+    $count = Task::count();
     return response()->json(['number_of_tasks' => $count], 200);
 
 
@@ -303,14 +303,14 @@ public function getNumberGlobaleofTasks()
 
 public function getNumberTaskforUser($userId)
 {
-    $count = Tasks::where('assigned_to', $userId)->count();
+    $count = Task::where('assigned_to', $userId)->count();
     return response()->json(['number_of_tasks_for_user' => $count], 200);
 }
 
 
 public function getNumberTaskTeamforUser($userId, Request $request)
 {   $manager = $request->user();
-    $count = Tasks::where('assigned_to', $userId)->where('created_by', $manager->id)->count();
+    $count = Task::where('assigned_to', $userId)->where('created_by', $manager->id)->count();
     return response()->json(['number_of_team_tasks_for_user' => $count], 200);
 
 
@@ -321,10 +321,10 @@ public function getNumberTaskTeamforUser($userId, Request $request)
 
 public function getStatistiquetask ()
 {
-    $totalTasks = Tasks::count();
-    $completedTasks = Tasks::where('status', 'completed')->count();
-    $pendingTasks = Tasks::where('status', 'pending')->count();
-    $inProgressTasks = Tasks::where('status', 'in_progress')->count();
+    $totalTasks = Task::count();
+    $completedTasks = Task::where('status', 'completed')->count();
+    $pendingTasks = Task::where('status', 'pending')->count();
+    $inProgressTasks = Task::where('status', 'in_progress')->count();
 
     return response()->json([
         'total_tasks' => $totalTasks,
@@ -338,4 +338,4 @@ public function getStatistiquetask ()
 
 
 }
-
+}
