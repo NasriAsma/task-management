@@ -24,12 +24,7 @@ class UserController extends Controller
             'password' => bcrypt($valida['password']),
         ]);
 
-        // Enregistrer l'activité
-        activity()
-            ->performedOn($user)
-            ->causedBy($request->user())
-            ->log('Nouvel utilisateur créé');
-
+        
         return response()->json([
             'message' => 'User created successfully',
             'user' => $user,
@@ -88,12 +83,6 @@ public function deleteUser($id)
         return response()->json(['message' => 'User not found'], 404);
     }
 
-    // Enregistrer l'activité avant la suppression
-    activity()
-        ->performedOn($user)
-        ->causedBy(request()->user())
-        ->log('Utilisateur supprimé');
-
     $user->delete();
 
     return response()->json(['message' => 'User deleted successfully'], 200);
@@ -120,12 +109,6 @@ public function desactiveCompte($id)
 
     $user->is_active = false;
     $user->save();
-
-    // Enregistrer l'activité
-    activity()
-        ->performedOn($user)
-        ->causedBy(request()->user())
-        ->log('Compte utilisateur désactivé');
 
     return response()->json(['message' => 'User account deactivated successfully'], 200);
 

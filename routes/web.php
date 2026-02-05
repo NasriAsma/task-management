@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\RoleController;
 
 /*
@@ -16,6 +17,21 @@ use App\Http\Controllers\RoleController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/test-log', function () {
+    // Test avec différents niveaux
+    Log::debug('Message de débogage');
+    Log::info('Information');
+    Log::notice('Notice');
+    Log::warning('Avertissement');
+    Log::error('Erreur détectée', ['erreur_code' => 'E001']);
+    Log::critical('Problème critique', ['serveur' => 'DB']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Logs écrits ! Vérifiez storage/logs/laravel.log'
+    ]);
 });
 
 // Route pour le lien de réinitialisation de mot de passe (redirige vers Angular)

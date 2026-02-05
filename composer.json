@@ -13,8 +13,9 @@
         "laravel/framework": "^9.52",
         "laravel/sanctum": "^2.15",
         "laravel/tinker": "^2.5",
-        "owen-it/laravel-auditing": "^13.7",
+        "opcodesio/log-viewer": "^3.21",
         "pragmarx/google2fa": "^9.0",
+        "spatie/laravel-activitylog": "^4.11",
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {

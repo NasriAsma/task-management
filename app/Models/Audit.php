@@ -5,20 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class audits extends Model
+class Audit extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'event',
         'user_id',
-        'action',
-        'auditable_type',
-        'auditable_id',
-        'old_values',
-        'new_values',
+        'values',
         'url',
         'ip_address',
         'user_agent',
+        'description',
     ];
 
     public function user()

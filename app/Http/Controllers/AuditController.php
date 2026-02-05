@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Audits;
+use App\Models\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -21,7 +20,7 @@ class AuditController extends Controller
             'sort_order' => 'in:asc,desc',
         ]);
 
-        $query = Audits::where('user_id', $user->id);
+        $query = Audit::where('user_id', $user->id);
 
         if (!empty($validated['start_date'])) {
             $query->whereDate('created_at', '>=', $validated['start_date']);

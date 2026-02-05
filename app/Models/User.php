@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -7,11 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements Auditable
+
+//Imports de packages d'activity_log
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Contracts\Activity;
+
+class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, \OwenIt\Auditing\Auditable;
+    use LogsActivity;
+
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +32,30 @@ class User extends Authenticatable implements Auditable
         'code_2FA_expiry',
         'is_2fa_enabled'
     ];
+
+    // 1. Configuration des champs à surveiller (Old / New / Type d'action)
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email']) // Les champs à surveiller
+            ->logOnlyDirty() // IMPORTANT : Permet de générer les tableaux "attributes" (New) et "old" (Old)
+            ->dontSubmitEmptyLogs(); // N'enregistre rien s'il n'y a pas de changement
+    }
+
+    // 2. Injection des données supplémentaires (IP, User contextuel)
+    // Cette méthode est appelée juste avant que l'activité ne soit sauvegardée en base.
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        // Ajout de l'adresse IP dans les propriétés personnalisées
+        $activity->properties = $activity->properties->merge([
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->header('User-Agent'), // Bonus : le navigateur utilisé
+        ]);
+        
+        // Note : Le "User", le "Temps", et le "Type d'action" sont gérés automatiquement
+        // par le package, voir les explications ci-dessous.
+    }
+
 
     public function roles()
     {
