@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Log;
 
 
 //Imports de packages d'activity_log
@@ -33,27 +34,36 @@ class User extends Authenticatable
         'is_2fa_enabled'
     ];
 
-    // 1. Configuration des champs à surveiller (Old / New / Type d'action)
+    // 1. Configure les champs suivis + le comportement d'enregistrement
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email']) // Les champs à surveiller
-            ->logOnlyDirty() // IMPORTANT : Permet de générer les tableaux "attributes" (New) et "old" (Old)
-            ->dontSubmitEmptyLogs(); // N'enregistre rien s'il n'y a pas de changement
+            ->logOnly(['name', 'email']) // Champs surveillés
+            ->logOnlyDirty() // Génère "attributes" (new) et "old" seulement si changement
+            ->dontSubmitEmptyLogs(); // Ne log rien si aucun changement
     }
 
-    // 2. Injection des données supplémentaires (IP, User contextuel)
-    // Cette méthode est appelée juste avant que l'activité ne soit sauvegardée en base.
+    // 2. Ajoute des infos contextuelles avant l'enregistrement en base
     public function tapActivity(Activity $activity, string $eventName)
     {
-        // Ajout de l'adresse IP dans les propriétés personnalisées
+        // Ajoute IP + navigateur dans les propriétés personnalisées
         $activity->properties = $activity->properties->merge([
             'ip_address' => request()->ip(),
             'user_agent' => request()->header('User-Agent'), // Bonus : le navigateur utilisé
         ]);
-        
-        // Note : Le "User", le "Temps", et le "Type d'action" sont gérés automatiquement
-        // par le package, voir les explications ci-dessous.
+
+
+
+        // 3. Log dans le fichier de log aussi  
+        Log::channel(config('logging.default'))->info('Activity log', [
+            'event' => $eventName,
+            'subject_type' => $activity->subject_type,
+            'subject_id' => $activity->subject_id,
+            'causer_id' => $activity->causer_id,
+            'properties' => $activity->properties,
+        ]);
+
+        // Le user, la date et le type d'action (created/updated/deleted) sont gérés par le package
     }
 
 
