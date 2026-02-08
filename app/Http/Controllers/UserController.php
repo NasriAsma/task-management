@@ -89,15 +89,24 @@ public function deleteUser($id)
 }
 
 
-public function getUser($id)
-{   
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    } else {
-        return response()->json($user, 200);
-    }
+//public function getUser($id)
+//{   
+   // $user = User::find($id);
+   // if (!$user) {
+       // return response()->json(['message' => 'User not found'], 404);
+   // } else {
+      //  return response()->json($user, 200);
+   // }
 
+//}
+
+public function getUser(Request $request)
+{
+    $user = $request->user(); // utilisateur connecté via auth:sanctum ou auth:api
+    if (!$user) {
+        return response()->json(['message' => 'User not authenticated'], 401);
+    }
+    return response()->json(['user' => $user], 200);
 }
 
 public function desactiveCompte($id)
