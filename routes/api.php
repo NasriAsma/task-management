@@ -10,6 +10,8 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\tasksController;
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\ProfileController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,10 +34,10 @@ Route::post('/verify-2fa', [AuthController::class, 'verify2fa']);
 
 
 Route::middleware('auth:sanctum')->post('/logout',[AuthController::class,'logout']);
-Route::middleware('auth:sanctum')->post('/toggle-2fa',[update_profile::class,'toggle2FA']);
-Route::middleware('auth:sanctum')->post('/request-update-code',[update_profile::class,'requestUpdateCode']);
-Route::middleware('auth:sanctum')->put('/update-profile',[update_profile::class,'updateUser']);
-Route::middleware('auth:sanctum')->get('/user',[update_profile::class,'getUser']);
+Route::middleware('auth:sanctum')->post('/toggle-2fa',[ProfileController::class,'toggle2FA']);
+Route::middleware('auth:sanctum')->post('/request-update-code',[ProfileController::class,'requestUpdateCode']);
+Route::middleware('auth:sanctum')->put('/update-profile',[ProfileController::class,'updateUser']);
+Route::middleware('auth:sanctum')->get('/user',[ProfileController::class,'getUser']);
 Route::middleware('auth:sanctum')->post('/assign-role/{roleName}', [RoleController::class, 'assignRole']);
 Route::middleware('auth:sanctum')->get('/has-role/{roleName}', [RoleController::class, 'hasRole']);
 Route::middleware('auth:sanctum')->get('/get-roles', [RoleController::class, 'getRoles']);
