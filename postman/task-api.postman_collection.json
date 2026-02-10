@@ -1,0 +1,422 @@
+{
+  "info": {
+    "name": "Task API",
+    "description": "Postman collection generated from Laravel route list.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://127.0.0.1:8000/api"},
+    {"key": "token", "value": ""},
+    {"key": "id", "value": "1"},
+    {"key": "userId", "value": "1"},
+    {"key": "taskId", "value": "1"},
+    {"key": "roleName", "value": "admin"},
+    {"key": "user", "value": "1"}
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {"key": "token", "value": "{{token}}", "type": "string"}
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/login",
+            "description": "POST /api/login"
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/register",
+            "description": "POST /api/register"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/logout",
+            "description": "POST /api/logout"
+          }
+        },
+        {
+          "name": "Verify 2FA",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/verify-2fa",
+            "description": "POST /api/verify-2fa"
+          }
+        },
+        {
+          "name": "Toggle 2FA",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/toggle-2fa",
+            "description": "POST /api/toggle-2fa"
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/forgot-password",
+            "description": "POST /api/forgot-password"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/reset-password",
+            "description": "POST /api/reset-password"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/user",
+            "description": "GET /api/user"
+          }
+        },
+        {
+          "name": "Request Update Code",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/request-update-code",
+            "description": "POST /api/request-update-code"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/update-profile",
+            "description": "PUT /api/update-profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users",
+            "description": "GET /api/users"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/user/{{id}}",
+            "description": "GET /api/user/{id}"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/createUser",
+            "description": "POST /api/createUser"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/updateUser/{{id}}",
+            "description": "PUT /api/updateUser/{id}"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/deleteUser/{{id}}",
+            "description": "DELETE /api/deleteUser/{id}"
+          }
+        },
+        {
+          "name": "Activate Account",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/active_compte/{{id}}",
+            "description": "POST /api/active_compte/{id}"
+          }
+        },
+        {
+          "name": "Deactivate Account",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/desactive_compte/{{id}}",
+            "description": "PUT /api/desactive_compte/{id}"
+          }
+        },
+        {
+          "name": "User Audits",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/user/{{user}}/audits",
+            "description": "GET /api/user/{user}/audits"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Get Roles",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/get-roles",
+            "description": "GET /api/get-roles"
+          }
+        },
+        {
+          "name": "Has Role",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/has-role/{{roleName}}",
+            "description": "GET /api/has-role/{roleName}"
+          }
+        },
+        {
+          "name": "Assign Role (current user)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/assign-role/{{roleName}}",
+            "description": "POST /api/assign-role/{roleName}"
+          }
+        },
+        {
+          "name": "Assign Role (user)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/assign-role/{{roleName}}/{{id}}",
+            "description": "POST /api/assign-role/{roleName}/{id}"
+          }
+        },
+        {
+          "name": "Remove Role",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/remove-role/{{roleName}}/{{id}}",
+            "description": "PUT /api/remove-role/{roleName}/{id}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "item": [
+        {
+          "name": "List Permissions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/permissions",
+            "description": "GET /api/permissions"
+          }
+        },
+        {
+          "name": "Create Permission",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/create_permission",
+            "description": "POST /api/create_permission"
+          }
+        },
+        {
+          "name": "Update Permission",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/update_permission",
+            "description": "PUT /api/update_permission"
+          }
+        },
+        {
+          "name": "Delete Permission",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/delete_permission/{{id}}",
+            "description": "DELETE /api/delete_permission/{id}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "List Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/get-tasks",
+            "description": "GET /api/get-tasks"
+          }
+        },
+        {
+          "name": "View Own Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/view_own_tasks/{{id}}",
+            "description": "GET /api/view_own_tasks/{id}"
+          }
+        },
+        {
+          "name": "View Task Details",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/view_task_details/{{id}}",
+            "description": "GET /api/view_task_details/{id}"
+          }
+        },
+        {
+          "name": "View Task For User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/view_task_for_user/{{userId}}/{{taskId}}",
+            "description": "GET /api/view_task_for_user/{userId}/{taskId}"
+          }
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/create-task/{{id}}",
+            "description": "POST /api/create-task/{id}"
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/update-task/{{id}}",
+            "description": "PUT /api/update-task/{id}"
+          }
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/update_task_status/{{id}}",
+            "description": "PUT /api/update_task_status/{id}"
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/delete-task/{{id}}",
+            "description": "DELETE /api/delete-task/{id}"
+          }
+        },
+        {
+          "name": "Assign Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/assign-task/{{taskId}}/{{userId}}",
+            "description": "POST /api/assign-task/{taskId}/{userId}"
+          }
+        },
+        {
+          "name": "Team Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/team-tasks/{{userId}}",
+            "description": "GET /api/team-tasks/{userId}"
+          }
+        },
+        {
+          "name": "Create Team Task",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/create-team-task/{{userId}}/{{id}}",
+            "description": "POST /api/create-team-task/{userId}/{id}"
+          }
+        },
+        {
+          "name": "Update Team Task",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/update-team-task/{{userId}}/{{id}}",
+            "description": "PUT /api/update-team-task/{userId}/{id}"
+          }
+        },
+        {
+          "name": "Delete Team Task",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/delete-team-task/{{userId}}/{{id}}",
+            "description": "DELETE /api/delete-team-task/{userId}/{id}"
+          }
+        },
+        {
+          "name": "Count Team Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/count-team-tasks/{{userId}}",
+            "description": "GET /api/count-team-tasks/{userId}"
+          }
+        },
+        {
+          "name": "Number Of Tasks",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/number-of-tasks",
+            "description": "GET /api/number-of-tasks"
+          }
+        },
+        {
+          "name": "Number Of Tasks For User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/number-of-tasks-for-user/{{userId}}",
+            "description": "GET /api/number-of-tasks-for-user/{userId}"
+          }
+        },
+        {
+          "name": "Task Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/statistique-task",
+            "description": "GET /api/statistique-task"
+          }
+        },
+        {
+          "name": "User Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/statistique-user",
+            "description": "GET /api/statistique-user"
+          }
+        },
+        {
+          "name": "Number Of Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/number-of-users",
+            "description": "GET /api/number-of-users"
+          }
+        }
+      ]
+    }
+  ]
+}
