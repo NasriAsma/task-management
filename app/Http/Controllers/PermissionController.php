@@ -20,13 +20,13 @@ class PermissionController extends Controller
 	
 
 
-	public function store(Request $request , $id)
+	public function store(Request $request , $idUser)
 	{
 		$data = $request->validate([
 			'name' => 'required|string|max:255|unique:permissions,name',
 			'description' => 'nullable|string|max:255',
 		]);
-        $user = User::find($id);
+        $user = User::find($idUser);
 		$permission = $user->Permission::create($data);
 
 		return response()->json([

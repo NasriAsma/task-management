@@ -4,10 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\update_profile;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\TaskController;
+use App\Http\Controllers\taskController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ProfileController;
 
@@ -62,24 +63,24 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:create_permission')->post('/create_permission', [PermissionController::class, 'view_own_tasks']);
     Route::middleware('permission:delete_permission')->delete('/delete_permission/{id}', [PermissionController::class, 'deletePermission']);
     Route::middleware('permission:update_permission')->put('/update_permission', [PermissionController::class, 'store']);
-    Route::middleware('permission:view_statistique_task')->get('/statistique-task', [TaskController::class, 'getTaskStatistics']);
+    Route::middleware('permission:view_statistique_task')->get('/statistique-task', [TaskController::class, 'getStatistiquetask']);
     Route::middleware('permission:view_statistique_user')->get('/statistique-user', [UserController::class, 'getStatistiqueUser']);
     Route::middleware('permission:view_all_Number_of_user')->get('/number-of-users', [UserController::class, 'getNumberTasksPerUser']);
-    Route::middleware('permission:view_all_Number_of_task')->get('/number-of-tasks', [TaskController::class, 'getTaskCount']);
-    Route::middleware('permission:view_Number_of_task_for_user')->get('/number-of-tasks-for-user/{userId}', [TaskController::class, 'getUserTaskCount']);
+    Route::middleware('permission:view_all_Number_of_task')->get('/number-of-tasks', [TaskController::class, 'getNumberGlobaleofTasks']);
+    Route::middleware('permission:view_Number_of_task_for_user')->get('/number-of-tasks-for-user/{userId}', [TaskController::class, 'getNumberTaskforUser']);
    
 
   
     Route::middleware('permission:assign_role')->post('/assign-role/{roleName}/{id}', [RoleController::class, 'assignRole']);
     Route::middleware('permission:delete_role')->put('/remove-role/{roleName}/{id}', [RoleController::class, 'removeRole']);
    
-    Route::middleware('permission:assign_task')->post('/assign-task/{taskId}/{userId}', [TaskController::class, 'assignTask']);
-    Route::middleware('permission:view_task_details')->get('/view_task_details/{id}', [TaskController::class, 'viewTaskDetails']);
-    Route::middleware('permission:view_task')->get('/get-tasks', [TaskController::class, 'viewAllTasks']);
-    Route::middleware('permission:view_own_tasks')->get('/view_own_tasks/{id}', [TaskController::class, 'viewOwnTask']);
-    Route::middleware('permission:create_task')->post('/create-task/{id}', [TaskController::class, 'store']);
-    Route::middleware('permission:update_task')->put('/update-task/{id}', [TaskController::class, 'update']);
-    Route::middleware('permission:delete_task')->delete('/delete-task/{id}', [TaskController::class, 'destroy']);   
+    Route::middleware('permission:assign_task')->post('/assign-task/{taskId}/{userId}', [Controller::class, 'assignTask']);
+    Route::middleware('permission:view_task_details')->get('/view_task_details/{id}', [taskController::class, 'view_task_details']);
+    Route::middleware('permission:view_task')->get('/get-tasks', [tasksController::class, 'view_all_tasks']);
+    Route::middleware('permission:view_own_tasks')->get('/view_own_tasks/{id}', [taskController::class, 'view_own_tasks']);
+    Route::middleware('permission:create_task')->post('/create-task/{id}', [taskController::class, 'store']);
+    Route::middleware('permission:update_task')->put('/update-task/{id}', [taskController::class, 'update']);
+    Route::middleware('permission:delete_task')->delete('/delete-task/{id}', [taskController::class, 'destroy_any_task']);   
     });
 
 
@@ -87,20 +88,20 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
 
 
 Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
-Route::middleware('permission:update_team_task')->put('/update-team-task/{userId}/{id}', [TaskController::class, 'updateTeamTask']);
+Route::middleware('permission:update_team_task')->put('/update-team-task/{userId}/{id}', [taskController::class, 'update_team_task']);
 Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
-Route::middleware('permission:create_team_task')->post('/create-team-task/{userId}/{id}', [TaskController::class, 'createTeamTask']);
-Route::middleware('permission:delete_team_task')->delete('/delete-team-task/{userId}/{id}', [TaskController::class, 'deleteTeamTask']);
+Route::middleware('permission:create_team_task')->post('/create-team-task/{userId}/{id}', [taskController::class, 'create_team_task']);
+Route::middleware('permission:delete_team_task')->delete('/delete-team-task/{userId}/{id}', [taskController::class, 'delete_team_task']);
 Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TaskController::class, 'viewTeamMemberTasks']);  
-Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/count-team-tasks/{userId}', [TaskController::class, 'getTeamTaskCount']);
+Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/count-team-tasks/{userId}', [TaskController::class, 'getNumberTaskTeamforUser']);
 
 
 });
 
 
 Route::middleware(['auth:sanctum', 'role:employe' ])->group(function () {
-Route::middleware('permission:view_task_for_user')->get('/view_task_for_user/{userId}/{taskId}', [TaskController::class, 'viewTaskForUser']);
-Route::middleware('permission:update_task_status')->put('/update_task_status/{userId}/{taskId}', [TaskController::class, 'updateTaskStatus']);
+Route::middleware('permission:view_task_for_user')->get('/view_task_for_user/{userId}/{taskId}', [tasksController::class, 'view_task_for_user']);
+Route::middleware('permission:update_task_status')->put('/update_task_status/{id}', [taskController::class, 'update_task_status']);
 });
 
 
