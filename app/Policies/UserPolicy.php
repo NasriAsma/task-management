@@ -9,14 +9,7 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
-    public function before(User $user, $ability): ?bool
-    {
-        if ($user->role === 'admin') {
-            return true;
-        }
-
-        return null;
-    }
+  
 
     public function viewAny(User $user): bool
     {
