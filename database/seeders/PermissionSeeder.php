@@ -80,8 +80,6 @@ class PermissionSeeder extends Seeder
         if ($manager) {
             $managerPermissions = Permission::whereIn('name', [
                 'view_user',
-                'view_task',
-                'view_task_details',
                 'create_team_task',
                 'update_team_task',
                 'delete_team_task',

@@ -115,6 +115,15 @@ class TaskController extends Controller
         ]);
     }
 
+    public function getTaskCount()
+    {
+        $this->authorize('viewGlobalStats', Task::class);
+
+        return response()->json([
+            'total_tasks' => Task::count(),
+        ]);
+    }
+
     public function getUserTaskCount($userId, Request $request)
     {
         // Un utilisateur ne peut voir que son propre compteur (ou un admin)

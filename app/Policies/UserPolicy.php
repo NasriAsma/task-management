@@ -9,112 +9,32 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
-    /**
-     * Determine whether the user can view any models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-
-    //voir la liste des utilisateurs
-    public function viewAny(User $user)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can view the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-
-    //voir un utilisateur par ID    
-    public function view(User $user, User $model)
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can create models.
-     *
-     * @param  \App\Models\User  $user
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function create(User $user)
+    public function before(User $user, $ability): ?bool
     {
         if ($user->role === 'admin') {
-            return true; // Les admins peuvent créer des utilisateurs
+            return true;
         }
+
+        return null;
+    }
+
+    public function viewAny(User $user): bool
+    {
         return false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function update(User $user, User $model)
+    public function viewTeam(User $user): bool
     {
-        if ($user->role === 'admin') {
-            return true; // Les admins peuvent modifier n'importe quel utilisateur
-        }
-        if ($user->id === $model->id) {
-            return true; // Les utilisateurs peuvent modifier leur propre profil
-        }
-        return false; // Les autres cas sont interdits
+        return $user->role === 'manager';
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function delete(User $user, User $model)
+    public function update(User $user, User $model): bool
     {
-        if ($user->role === 'admin') {
-            return true; // Les admins peuvent supprimer n'importe quel utilisateur
-        }
-        if ($user->id === $model->id) {
-            return true; // Les utilisateurs peuvent supprimer leur propre profil
-        }
-        return false; // Les autres cas sont interdits
+        return $user->id === $model->id;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function restore(User $user, User $model)
+    public function delete(User $user, User $model): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
-     * @return \Illuminate\Auth\Access\Response|bool
-     */
-    public function forceDelete(User $user, User $model)
-    {
-        //
-    }
-
-
-    public function viewStatique(User $user, User $model) 
-    
-    { if ($user->role === 'admin') 
-    { return true; }
-
+        return false;
     }
 }
