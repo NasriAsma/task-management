@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function createUser(Request $request)
     {
-     
+        $this->authorize('create', User::class);
         $valida = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -34,7 +34,7 @@ class UserController extends Controller
 
 
 public function index(Request $request)
-{
+{   
     $perPage = (int) $request->query('per_page', 15);
     $users = User::paginate($perPage);
     return response()->json($users);
@@ -43,7 +43,7 @@ public function index(Request $request)
 
 
 public function updateUser(Request $request, $id)
-{
+{ $this->authorize('update', User::class);
     $user = User::find($id);
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);}
@@ -77,7 +77,7 @@ public function store(request $request , $id)
  }
 
 public function deleteUser($id)
-{
+{  $this->authorize('delete', User::class);
     $user = User::find($id);
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);
@@ -138,7 +138,7 @@ public function getNumberofUsers()
 }
 
 public function getStatistiqueUser()
-{
+{    $this->authorize('viewStatique', User::class);
    
   $statistique = [  'total_users' =>  $totalUsers = User::count() ,
             'active_users' => $activeUsers = User::where('is_active', true)->count() ,
