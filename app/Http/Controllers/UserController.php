@@ -4,30 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Http\Requests\UserRequest;
+use Illuminate\Support\Facades\Hash;
+
 
 
 class UserController extends Controller
 {   private const PER_PAGE = 15;
-    public function createUser(Request $request)
+
+
+    public function createUser(UserRequest  $request)
     {
-        $this->authorize('create', User::class);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
+      
+    $this->authorize('create', User::class);
+    
+    $validated = $request->validated();
+    $validated['password'] = bcrypt($validated['password']);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+    $user = User::create($validated);
 
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user,
-        ], 201);
-    }
+    return response()->json(['message' => 'User created', 'user' => $user], 201);
+}
+
 
     public function index(Request $request)
     {
@@ -39,31 +37,26 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function updateUser(Request $request, $idUser)
+    public function updateUser(UserRequest $request, $idUser)
     {
-        $user = User::find($idUser);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    $user = User::findOrFail($idUser);
+    $this->authorize('update', $user);
 
-        $this->authorize('update', $user);
+    $validatedData = $request->validated();
 
-        $validatedData = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'sometimes|required|string|min:8',
-        ]);
+    if (isset($validatedData['password'])) {
+        $validatedData['password'] = Hash::make($validatedData['password']);
+    }
+    if (isset($validatedData['email'])) {
+        $validatedData['email'] = $validatedData['email'];
+    }
 
-        if (isset($validatedData['password'])) {
-            $validatedData['password'] = bcrypt($validatedData['password']);
-        }
+    if (isset($validatedData['name'])) {
+        $validatedData['name'] = $validatedData['name'];
+    }
+    $user->update($validatedData);
+    return response()->json(['message' => 'User updated', 'user' => $user]);
 
-        $user->update($validatedData);
-
-        return response()->json([
-            'message' => 'User updated successfully',
-            'user' => $user,
-        ], 200);
     }
 
     public function store(Request $request, $id)

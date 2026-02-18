@@ -48,12 +48,12 @@ Route::middleware('auth:sanctum')->get('/get-roles', [RoleController::class, 'ge
 
 Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:create_user')->post('/create-user', [UserController::class,'createUser']);
-    Route::middleware('permission:update_user')->put('/update-user/{id}', [UserController::class,'updateUser']);
-    Route::middleware('permission:delete_user')->delete('/delete-user/{id}', [UserController::class,'deleteUser']);
+    Route::middleware('permission:update_user')->put('/update-user/{idUser}', [UserController::class,'updateUser']);
+    Route::middleware('permission:delete_user')->delete('/delete-user/{idUser}', [UserController::class,'deleteUser']);
     Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
-    Route::middleware('permission:view_user_par_id')->get('/users/{id}', [UserController::class,'getUser']);
-    Route::middleware('permission:active_compte')->post('/active-compte/{id}', [UserController::class, 'activeCompte']);
-    Route::middleware('permission:desactive_compte')->put('/desactive-compte/{id}', [UserController::class, 'desactiveCompte']);
+    Route::middleware('permission:view_user_par_id')->get('/users/{idUser}', [UserController::class,'getUser']);
+    Route::middleware('permission:active_compte')->post('/active-compte/{idUser}', [UserController::class, 'activeCompte']);
+    Route::middleware('permission:desactive_compte')->put('/desactive-compte/{idUser}', [UserController::class, 'desactiveCompte']);
 
     Route::middleware(['permission:view_audits', 'api.audit'])->get('/users/{user}/audits', [AuditController::class, 'getUserAudits']);
 
@@ -76,31 +76,24 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:assign_task')->post('/assign-task/{taskId}/{userId}', [TaskController::class, 'assignTask']);
     Route::middleware('permission:view_task_details')->get('/view-task-details/{id}', [TaskController::class, 'show']);
     Route::middleware('permission:view_task')->get('/tasks', [TaskController::class, 'index']);
-    Route::middleware('permission:view_own_tasks')->get('/my-tasks', [TaskController::class, 'index']);
-    Route::middleware('permission:create_task')->post('/tasks', [TaskController::class, 'store']);
-    Route::middleware('permission:update_task')->put('/tasks/{id}', [TaskController::class, 'update']);
-    Route::middleware('permission:delete_task')->delete('/tasks/{id}', [TaskController::class, 'destroy']);   
-    });
-
-
-
-
-
-Route::middleware(['auth:sanctum', 'role:manager' ])->group(function () {
-Route::middleware('permission:update_team_task')->put('/team-tasks/{id}', [TaskController::class, 'update']);
-Route::middleware('permission:view_user')->get('/users', [UserController::class,'index']);
-Route::middleware('permission:create_team_task')->post('/team-tasks', [TaskController::class, 'store']);
-Route::middleware('permission:delete_team_task')->delete('/team-tasks/{id}', [TaskController::class, 'destroy']);
-Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TaskController::class, 'viewTeamMemberTasks']);  
-Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/team-tasks/{userId}/count', [TaskController::class, 'getUserTaskCount']);
-
-
+    Route::middleware('permission:view_own_tasks')->get('/my-tasks', [TaskController::class, 'index']) ->name('my-tasks');
+    Route::middleware('permission:create_task')->post('/tasks', [TaskController::class, 'store']) ->name('create-task');
+    Route::middleware('permission:update_task')->put('/tasks/{id}', [TaskController::class, 'update']) ->name('update-task');
+    Route::middleware('permission:delete_task')->delete('/tasks/{id}', [TaskController::class, 'destroy']) ->name('delete-task');
 });
 
+Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {
+    Route::middleware('permission:update_team_task')->put('/team-tasks/{id}', [TaskController::class, 'update'])->name('update-team-task');
+    Route::middleware('permission:view_user')->get('/users', [UserController::class, 'index']);
+    Route::middleware('permission:create_team_task')->post('/team-tasks', [TaskController::class, 'store'])->name('create-team-task');
+    Route::middleware('permission:delete_team_task')->delete('/team-tasks/{id}', [TaskController::class, 'destroy'])->name('delete-team-task');
+    Route::middleware('permission:view_team_tasks')->get('/team-tasks/{userId}', [TaskController::class, 'viewTeamMemberTasks'])->name('view-team-tasks');
+    Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/team-tasks/{userId}/count', [TaskController::class, 'getUserTaskCount']);
+});
 
-Route::middleware(['auth:sanctum', 'role:employe' ])->group(function () {
-Route::middleware('permission:view_task_for_user')->get('/tasks/{id}', [TaskController::class, 'show']);
-Route::middleware('permission:update_task_status')->put('/tasks/{id}/status', [TaskController::class, 'updateStatus']);
+Route::middleware(['auth:sanctum', 'role:employee'])->group(function () {
+    Route::middleware('permission:view_task_for_user')->get('/tasks/{id}', [TaskController::class, 'show']);
+    Route::middleware('permission:update_task_status')->put('/tasks/{id}/status', [TaskController::class, 'updateStatus'])->name('updateStatus');
 });
 
 

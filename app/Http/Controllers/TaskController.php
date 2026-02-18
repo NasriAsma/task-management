@@ -18,25 +18,16 @@ class TaskController extends Controller
         return response()->json($tasks);
     }
 
-    public function store(Request $request)
-    {
-        $this->authorize('create', Task::class);
+    public function store(TaskRequest $request) 
+{
+    $this->authorize('create', Task::class);
 
-        $data = $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'due_date'    => 'nullable|date',
-            'priority'    => 'nullable|in:low,medium,high',
-            'assigned_to' => 'nullable|exists:users,id',
-        ]);
-
-        // Sécurité : On force le créateur à être l'utilisateur connecté
-        $data['created_by'] = $request->user()->id;
-        $task = Task::create($data);
-
-        return response()->json(['message' => 'Task created', 'task' => $task], 201);
-    }
-
+    $data = $request->validated(); // <-- Récupère les données déjà validées
+    $data['created_by'] = $request->user()->id;
+    
+    $task = Task::create($data);
+    return response()->json(['message' => 'Task created', 'task' => $task], 201);
+}
     public function show($id)
     {
         $task = Task::with(['creator', 'assignee'])->findOrFail($id);
@@ -45,16 +36,13 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
-    public function update(Request $request, $id)
+    public function update(TaskRequest $request, $id)
     {
         $task = Task::findOrFail($id);
         $this->authorize('update', $task);
 
-        $data = $request->validate([
-            'title'    => 'sometimes|string|max:255',
-            'priority' => 'sometimes|in:low,medium,high',
-            'status'   => 'sometimes|in:pending,in_progress,completed',
-        ]);
+        $data = $request->validated();
+       
 
         $task->update($data);
         return response()->json(['message' => 'Task updated', 'task' => $task]);
@@ -92,12 +80,12 @@ class TaskController extends Controller
 
     // --- SECTION : STATUTS ET STATISTIQUES ---
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(TaskStatusRequest $request, $id)
     {
         $task = Task::findOrFail($id);
         $this->authorize('updateStatus', $task); // Assigné OU Créateur autorisé
 
-        $data = $request->validate(['status' => 'required|in:pending,in_progress,completed']);
+        $data = $request->validated();
         $task->update(['status' => $data['status']]);
 
         return response()->json(['message' => 'Status updated']);
