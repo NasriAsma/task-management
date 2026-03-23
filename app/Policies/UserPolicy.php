@@ -9,25 +9,28 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
-  
+    public function create(User $user): bool
+    {
+        return $user->hasRole('admin');
+    }
 
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasRole('admin') || $user->hasRole('manager');
     }
 
     public function viewTeam(User $user): bool
     {
-        return $user->role === 'manager';
+        return $user->hasRole('manager');
     }
 
     public function update(User $user, User $model): bool
     {
-        return $user->id === $model->id;
+        return $user->hasRole('admin') || $user->id === $model->id;
     }
 
     public function delete(User $user, User $model): bool
     {
-        return false;
+        return $user->hasRole('admin') && $user->id !== $model->id;
     }
 }

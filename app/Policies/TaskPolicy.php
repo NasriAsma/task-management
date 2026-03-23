@@ -38,6 +38,6 @@ class TaskPolicy
     // Statistiques globales : Seulement pour les admins
     public function viewGlobalStats(User $user)
     {
-        return $user->role === 'admin';
+        return $user->hasRole('admin');
     }
 }

@@ -115,7 +115,7 @@ class TaskController extends Controller
     public function getUserTaskCount($userId, Request $request)
     {
         // Un utilisateur ne peut voir que son propre compteur (ou un admin)
-        if ($request->user()->id != $userId && $request->user()->role !== 'admin') {
+        if ($request->user()->id != $userId && !$request->user()->hasRole('admin')) {
             abort(403);
         }
 
