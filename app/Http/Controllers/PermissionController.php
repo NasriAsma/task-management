@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 
 
 
@@ -20,19 +21,39 @@ class PermissionController extends Controller
 	
 
 
-	public function store(Request $request , $id)
+	public function store(Request $request, $idUser)
 	{
+		User::findOrFail($idUser);
+
 		$data = $request->validate([
 			'name' => 'required|string|max:255|unique:permissions,name',
 			'description' => 'nullable|string|max:255',
 		]);
-        $user = User::find($id);
-		$permission = $user->Permission::create($data);
+
+		$permission = Permission::create($data);
 
 		return response()->json([
 			'message' => 'Permission created successfully',
 			'permission' => $permission,
 		], 201);
+	}
+
+	public function updatePermission(Request $request, $idUser, $id)
+	{
+		User::findOrFail($idUser);
+		$permission = Permission::findOrFail($id);
+
+		$data = $request->validate([
+			'name' => 'sometimes|string|max:255|unique:permissions,name,' . $permission->id,
+			'description' => 'sometimes|nullable|string|max:255',
+		]);
+
+		$permission->update($data);
+
+		return response()->json([
+			'message' => 'Permission updated successfully',
+			'permission' => $permission,
+		]);
 	}
 
 	public function givePermissionToRole($roleName, $permissionName)
@@ -57,10 +78,11 @@ class PermissionController extends Controller
 	}
 
 public function deletePermission(Request $request, $id)
-{      $permission =permission::findorfail($id);
-	 if($permission){
-		$permission->delete();
-		return response()->json(['message'=>'Permission deleted successfully'],200); }
+{
+	$permission = Permission::findOrFail($id);
+	$permission->delete();
+
+	return response()->json(['message' => 'Permission deleted successfully'], 200);
 }
 
 

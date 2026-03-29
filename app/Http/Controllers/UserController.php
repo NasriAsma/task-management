@@ -4,150 +4,138 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Spatie\Activitylog\Models\Activity;
+use App\Http\Requests\UserRequest;
+use Illuminate\Support\Facades\Hash;
+
 
 
 class UserController extends Controller
-{
-    public function createUser(Request $request)
+{   private const PER_PAGE = 15;
+
+
+    public function createUser(UserRequest  $request)
     {
-     
-        $valida = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
+      
+    $this->authorize('create', User::class);
+    
+    $validated = $request->validated();
+    $validated['password'] = bcrypt($validated['password']);
 
-        $user = User::create([
-            'name' => $valida['name'],
-            'email' => $valida['email'],
-            'password' => bcrypt($valida['password']),
-        ]);
+    $user = User::create($validated);
 
-        
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user,
-        ], 201);
-    }
-
-
-
-public function index(Request $request)
-{
-    $perPage = (int) $request->query('per_page', 15);
-    $users = User::paginate($perPage);
-    return response()->json($users);
-
+    return response()->json(['message' => 'User created', 'user' => $user], 201);
 }
 
 
-public function updateUser(Request $request, $id)
-{
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);}
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', User::class);
 
-    $validatedData = $request->validate([
-        'name' => 'sometimes|required|string|max:255',
-        'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
-        'password' => 'sometimes|required|string|min:8',
-    ]);
+        $perPage = (int) $request->query('per_page', self::PER_PAGE);
+        $users = User::paginate($perPage);
+
+        return response()->json($users);
+    }
+
+    public function updateUser(UserRequest $request, $idUser)
+    {
+    $user = User::findOrFail($idUser);
+    $this->authorize('update', $user);
+
+    $validatedData = $request->validated();
 
     if (isset($validatedData['password'])) {
-        $validatedData['password'] = bcrypt($validatedData['password']);
+        $validatedData['password'] = Hash::make($validatedData['password']);
+    }
+    if (isset($validatedData['email'])) {
+        $validatedData['email'] = $validatedData['email'];
     }
 
+    if (isset($validatedData['name'])) {
+        $validatedData['name'] = $validatedData['name'];
+    }
     $user->update($validatedData);
+    return response()->json(['message' => 'User updated', 'user' => $user]);
 
-    return response()->json([
-        'message' => 'User updated successfully',
-        'user' => $user,
-    ], 200);
-}
-
-
-public function store(request $request , $id)
- {     $user =user::find($id) ;
-     if(!$user){
-    return response()->json (['message'=>'user not found'],404);
-            }
-            else {
-        return response()->json ( $user) ;}
- }
-
-public function deleteUser($id)
-{
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
     }
 
-    $user->delete();
+    public function store(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
-    return response()->json(['message' => 'User deleted successfully'], 200);
-}
+        return response()->json($user);
+    }
 
+    public function deleteUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
-public function getUser($id)
-{   
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
-    } else {
+        $this->authorize('delete', $user);
+        $user->delete();
+
+        return response()->json(['message' => 'User deleted successfully'], 200);
+    }
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
         return response()->json($user, 200);
     }
 
-}
+    public function desactiveCompte($idUser)
+    {
+        $user = User::find($idUser);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
-public function desactiveCompte($id)
-{
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
+        $user->is_active = false;
+        $user->save();
+
+        return response()->json(['message' => 'User account deactivated successfully'], 200);
     }
 
-    $user->is_active = false;
-    $user->save();
+    public function activeCompte($idUser)
+    {
+        $user = User::find($idUser);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
-    return response()->json(['message' => 'User account deactivated successfully'], 200);
+        $user->is_active = true;
+        $user->save();
 
-}
-
-public function activeCompte($id)
-{
-    $user = User::find($id);
-    if (!$user) {
-        return response()->json(['message' => 'User not found'], 404);
+        return response()->json(['message' => 'User account activated successfully'], 200);
     }
 
-    $user->is_active = true;
-    $user->save();
+    public function getNumberofUsers()
+    {
+        $count = User::count();
+        return response()->json(['number_of_users' => $count], 200);
+    }
 
-    return response()->json(['message' => 'User account activated successfully'], 200);
+    public function getStatistiqueUser()
+    {
+        $this->authorize('viewAny', User::class);
 
-}
+        $statistique = [
+            'total_users' => User::count(),
+            'active_users' => User::where('is_active', true)->count(),
+            'inactive_users' => User::where('is_active', false)->count(),
+        ];
 
-
-public function getNumberofUsers()
-{
-    $count = User::count();
-    return response()->json(['number_of_users' => $count], 200);
-
-
-}
-
-public function getStatistiqueUser()
-{
-   
-  $statistique = [  'total_users' =>  $totalUsers = User::count() ,
-            'active_users' => $activeUsers = User::where('is_active', true)->count() ,
-             'inactive_users' =>  $inactiveUsers = User::where('is_active', false)->count() ];
-
-
-    return response()->json([
-           'statistique' => $statistique,
-       ], 200);
-
-}
+        return response()->json([
+            'statistique' => $statistique,
+        ], 200);
+    }
 }
