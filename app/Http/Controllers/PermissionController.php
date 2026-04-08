@@ -19,7 +19,11 @@ class PermissionController extends Controller
 		return response()->json(Permission::paginate($perPage));
 	}
 	
-
+    public function viewPermissionById($id)
+	{
+		$permission = Permission::findOrFail($id);
+		return response()->json($permission);
+	}
 
 	public function store(Request $request, $idUser)
 	{

@@ -50,13 +50,13 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_task_details', 'description' => 'Voir les détails d\'une tâche'],
             ['name' => 'view_own_tasks', 'description' => 'Voir ses propres tâches'],
             ['name' => 'assign_task', 'description' => 'Assigner une tâche'],
-
+            ['name' => 'getUserPermissions', 'description' => 'Obtenir les permissions d\'un utilisateur'],
             // Team Task Permissions
             ['name' => 'create_team_task', 'description' => 'Créer une tâche d\'équipe'],
             ['name' => 'update_team_task', 'description' => 'Modifier une tâche d\'équipe'],
             ['name' => 'delete_team_task', 'description' => 'Supprimer une tâche d\'équipe'],
             ['name' => 'view_team_tasks', 'description' => 'Voir les tâches de l\'équipe'],
-
+            ['name' => 'view_permission_by_id', 'description' => 'Voir une permission par ID'],
             // Employee Task Permissions
             ['name' => 'view_task_for_user', 'description' => 'Voir une tâche pour l\'utilisateur'],
             ['name' => 'update_task_status', 'description' => 'Mettre à jour le statut d\'une tâche'],

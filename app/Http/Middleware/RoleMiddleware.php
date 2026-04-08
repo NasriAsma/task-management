@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!Auth::check()) {
             return response()->json(['message' => 'Unauthenticated'], 401);
@@ -16,8 +16,16 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        if (!$user->hasRole($role)) {
-            return response()->json(['message' => 'Forbidden - Role required: ' . $role], 403);
+        $hasAnyRole = false;
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) {
+                $hasAnyRole = true;
+                break;
+            }
+        }
+
+        if (!$hasAnyRole) {
+            return response()->json(['message' => 'Forbidden - Role required: ' . implode(' or ', $roles)], 403);
         }
 
         return $next($request);

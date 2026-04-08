@@ -12,6 +12,70 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {   private const PER_PAGE = 15;
 
+    private const SAFE_USER_COLUMNS = [
+        'id',
+        'name',
+        'email',
+        'is_active',
+        'is_2fa_enabled',
+        'created_at',
+        'updated_at',
+    ];
+
+    private function safeUsersQuery()
+    {
+        return User::query()
+            ->select(self::SAFE_USER_COLUMNS)
+            ->with([
+                'roles:id,name',
+                'roles.permissions:id,name,description',
+            ]);
+    }
+
+    private function formatUser(User $user): array
+    {
+        $roles = $user->roles->map(function ($role) {
+            return [
+                'id' => $role->id,
+                'name' => $role->name,
+                'permissions' => $role->permissions->map(function ($permission) {
+                    return [
+                        'id' => $permission->id,
+                        'name' => $permission->name,
+                        'description' => $permission->description,
+                    ];
+                })->values()->all(),
+            ];
+        })->values();
+
+        $permissions = $user->roles
+            ->flatMap(function ($role) {
+                return $role->permissions;
+            })
+            ->unique('id')
+            ->values()
+            ->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                    'description' => $permission->description,
+                ];
+            })
+            ->all();
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'is_active' => (bool) $user->is_active,
+            'is_2fa_enabled' => (bool) $user->is_2fa_enabled,
+            'created_at' => optional($user->created_at)->toJSON(),
+            'updated_at' => optional($user->updated_at)->toJSON(),
+            'roles' => $roles->all(),
+            'permissions' => $permissions,
+        ];
+    }
+
 
     public function createUser(UserRequest  $request)
     {
@@ -32,9 +96,27 @@ class UserController extends Controller
         $this->authorize('viewAny', User::class);
 
         $perPage = (int) $request->query('per_page', self::PER_PAGE);
-        $users = User::paginate($perPage);
+        $users = $this->safeUsersQuery()->paginate($perPage);
 
-        return response()->json($users);
+        $data = $users->getCollection()->map(function (User $user) {
+            return $this->formatUser($user);
+        })->all();
+
+        return response()->json([
+            'current_page' => $users->currentPage(),
+            'data' => $data,
+            'first_page_url' => $users->url(1),
+            'from' => $users->firstItem(),
+            'last_page' => $users->lastPage(),
+            'last_page_url' => $users->url($users->lastPage()),
+            'links' => [],
+            'next_page_url' => $users->nextPageUrl(),
+            'path' => $users->path(),
+            'per_page' => $users->perPage(),
+            'prev_page_url' => $users->previousPageUrl(),
+            'to' => $users->lastItem(),
+            'total' => $users->total(),
+        ]);
     }
 
     public function updateUser(UserRequest $request, $idUser)
@@ -69,7 +151,7 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function deleteUser($id)
+    public function deleteUser($id)  
     {
         $user = User::find($id);
         if (!$user) {
@@ -84,12 +166,12 @@ class UserController extends Controller
 
     public function getUser($id)
     {
-        $user = User::find($id);
+        $user = $this->safeUsersQuery()->find($id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        return response()->json($user, 200);
+        return response()->json($this->formatUser($user), 200);
     }
 
     public function desactiveCompte($idUser)
@@ -138,4 +220,32 @@ class UserController extends Controller
             'statistique' => $statistique,
         ], 200);
     }
+
+
+
+public function getUserPermissions($idUser)
+{
+    $user = User::find($idUser);
+    if (!$user) {
+        return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $permissions = $user->roles
+        ->flatMap(function ($role) {
+            return $role->permissions;
+        })
+        ->unique('id')
+        ->values()
+        ->map(function ($permission) {
+            return [
+                'id' => $permission->id,
+                'name' => $permission->name,
+                'description' => $permission->description,
+            ];
+        })
+        ->all();
+
+    return response()->json(['permissions' => $permissions], 200);
+}
+
 }
