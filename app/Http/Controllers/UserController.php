@@ -142,14 +142,21 @@ class UserController extends Controller
     }
 
     public function store(Request $request, $id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
+    { 
+    // On récupère la valeur de recherche envoyée par le frontend
+    $term = $request->input('search');
 
-        return response()->json($user);
+    $user = User::where('id', $term)
+                ->orWhere('name', 'LIKE', "%" . $term . "%")
+                ->orWhere('email', $term)
+                ->first(); // On prend le premier résultat trouvé
+
+    if (!$user) {
+        return response()->json(['message' => 'Utilisateur non trouvé'], 404);
     }
+
+    return response()->json($user);
+}
 
     public function deleteUser($id)  
     {

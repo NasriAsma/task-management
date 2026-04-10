@@ -20,7 +20,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_user_par_id', 'description' => 'Voir un utilisateur par ID'],
             ['name' => 'active_compte', 'description' => 'Activer un compte utilisateur'],
             ['name' => 'desactive_compte', 'description' => 'Désactiver un compte utilisateur'],
-
+            ['name' => 'recherche_user', 'description' => 'Rechercher un utilisateur'],
             // Audit Permissions
             ['name' => 'view_audits', 'description' => 'Voir les audits'],
 

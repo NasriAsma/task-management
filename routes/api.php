@@ -54,6 +54,8 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:view_user_par_id')->get('/users/{idUser}', [UserController::class,'getUser']);
     Route::middleware('permission:active_compte')->post('/activecompte/{idUser}', [UserController::class, 'activeCompte']);
     Route::middleware('permission:desactive_compte')->put('/desactivecompte/{idUser}', [UserController::class, 'desactiveCompte']);
+    Route::middleware('permission:recherche_user')->get('/rechercheuser', [UserController::class, 'store']);
+
 
     Route::middleware(['permission:view_audits', 'api.audit'])->get('/users/{user}/audits', [AuditController::class, 'getUserAudits']);
 
