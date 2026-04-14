@@ -5,17 +5,111 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\TaskRequest;
+use App\Http\Requests\TaskStatusRequest;
 
 class TaskController extends Controller
 {
     private const PER_PAGE = 15;
 
+    private const SAFE_TASK_COLUMNS = [
+        'id',
+        'title',
+        'description',
+        'status',
+        'deadline',
+        'priority',
+        'assigned_to',
+        'created_by',
+        'created_at',
+        'updated_at',
+    ];
+
+    private function safeTasksQuery()
+    {
+        return Task::query()
+            ->select(self::SAFE_TASK_COLUMNS)
+            ->with([
+                'creator:id,name,email',
+                'assignee:id,name,email',
+            ]);
+    }
+
+    private function formatTask(Task $task): array
+    {
+        return [
+            'id' => $task->id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'status' => $task->status,
+            'deadline' => optional($task->deadline)->toJSON(),
+            'priority' => $task->priority,
+            'assigned_to' => $task->assigned_to,
+            'created_by' => $task->created_by,
+            'created_at' => optional($task->created_at)->toJSON(),
+            'updated_at' => optional($task->updated_at)->toJSON(),
+            'creator' => $task->creator ? [
+                'id' => $task->creator->id,
+                'name' => $task->creator->name,
+                'email' => $task->creator->email,
+            ] : null,
+            'assignee' => $task->assignee ? [
+                'id' => $task->assignee->id,
+                'name' => $task->assignee->name,
+                'email' => $task->assignee->email,
+            ] : null,
+        ];
+    }
+
     // --- SECTION : MES TÂCHES ---
 
     public function index(Request $request)
     {
-        $tasks = $request->user()->tasksAssigned()->paginate(self::PER_PAGE);
-        return response()->json($tasks);
+        $query = $this->safeTasksQuery();
+
+        if ($request->user()->hasRole('employee')) {
+            $query->where('assigned_to', $request->user()->id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->query('status'));
+        }
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->query('search'));
+            $query->where(function ($subQuery) use ($search) {
+                if (is_numeric($search)) {
+                    $subQuery->orWhere('id', (int) $search);
+                }
+
+                $subQuery
+                    ->orWhere('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $perPage = (int) $request->query('per_page', self::PER_PAGE);
+        $tasks = $query->paginate($perPage);
+
+        $data = $tasks->getCollection()->map(function (Task $task) {
+            return $this->formatTask($task);
+        })->all();
+
+        return response()->json([
+            'current_page' => $tasks->currentPage(),
+            'data' => $data,
+            'first_page_url' => $tasks->url(1),
+            'from' => $tasks->firstItem(),
+            'last_page' => $tasks->lastPage(),
+            'last_page_url' => $tasks->url($tasks->lastPage()),
+            'links' => [],
+            'next_page_url' => $tasks->nextPageUrl(),
+            'path' => $tasks->path(),
+            'per_page' => $tasks->perPage(),
+            'prev_page_url' => $tasks->previousPageUrl(),
+            'to' => $tasks->lastItem(),
+            'total' => $tasks->total(),
+        ]);
     }
 
     public function store(TaskRequest $request) 
