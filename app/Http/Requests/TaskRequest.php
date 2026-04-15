@@ -30,14 +30,19 @@ class TaskRequest extends FormRequest
                 'due_date'    => 'nullable|date',
                 'priority'    => 'nullable|in:low,medium,high',
                 'assigned_to' => 'nullable|exists:users,id',
+                'created_by' => 'required|exists:users,id'
             ];
         }
 
         // Si c'est une mise à jour (PUT/PATCH)
         return [
             'title'    => 'sometimes|string|max:255',
+            'description' => 'sometimes|nullable|string',
             'priority' => 'sometimes|in:low,medium,high',
             'status'   => 'sometimes|in:pending,in_progress,completed',
+            'assigned_to' => 'sometimes|nullable|exists:users,id',
+            'created_by' => 'sometimes|exists:users,id'
+
         ];
     }
 }
