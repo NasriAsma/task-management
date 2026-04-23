@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Role;
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -11,10 +12,25 @@ class RoleAuthorizationTest extends TestCase
 {
     use RefreshDatabase;
 
+    private array $permissionsByRole = [
+        'admin' => ['view_user', 'create_user'],
+        'manager' => ['view_user', 'create_team_task'],
+        'employe' => ['view_task_for_user'],
+    ];
+
     private function createUserWithRole(string $roleName): User
     {
         $user = User::factory()->create();
         $role = Role::query()->firstOrCreate(['name' => $roleName]);
+
+        $permissionNames = $this->permissionsByRole[$roleName] ?? [];
+        if (!empty($permissionNames)) {
+            $permissionIds = collect($permissionNames)
+                ->map(fn (string $permission) => Permission::query()->firstOrCreate(['name' => $permission])->id)
+                ->all();
+            $role->permissions()->syncWithoutDetaching($permissionIds);
+        }
+
         $user->roles()->syncWithoutDetaching([$role->id]);
         
         return $user->fresh();
@@ -46,9 +62,9 @@ class RoleAuthorizationTest extends TestCase
         $data = $this->getUserWithToken('manager');
         $token = $data['token'];
 
-        // Try to access admin-only route: /api/create-user
+        // Try to access admin-only route
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->post('/api/create-user', [
+            ->post('/api/createuser', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
                 'password' => 'password123'
@@ -75,9 +91,9 @@ class RoleAuthorizationTest extends TestCase
         $data = $this->getUserWithToken('manager');
         $token = $data['token'];
 
-        // Manager should be able to access manager-only route: /api/team-tasks
+        // Manager should be able to access manager-only route
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->post('/api/team-tasks', [
+            ->post('/api/teamtasks', [
                 'title' => 'Team Task',
                 'description' => 'Team Task Description',
                 'priority' => 'high',
@@ -95,7 +111,7 @@ class RoleAuthorizationTest extends TestCase
 
         // Employee should not be able to access manager routes
         $response = $this->withHeader('Authorization', "Bearer $token")
-            ->post('/api/team-tasks', [
+            ->post('/api/teamtasks', [
                 'title' => 'Team Task',
                 'priority' => 'high',
             ]);

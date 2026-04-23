@@ -92,7 +92,7 @@ Route::middleware(['auth:sanctum', 'role:manager'])->group(function () {
     Route::middleware('permission:view_Number_of_team_tasks_for_user')->get('/teamtasks/{userId}/count', [TaskController::class, 'getUserTaskCount']);
 });
 
-Route::middleware(['auth:sanctum', 'role:employee'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:employe'])->group(function () {
     Route::middleware('permission:view_task_for_user')->get('/tasks/{id}', [TaskController::class, 'show']);
     Route::middleware('permission:update_task_status')->put('/tasks/{id}/status', [TaskController::class, 'updateStatus'])->name('updateStatus');
 });
