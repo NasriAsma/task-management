@@ -15,18 +15,21 @@ class PermissionController extends Controller
 
 	public function index(Request $request)
 	{
+		$this->logRequest($request, __FUNCTION__);
 		$perPage = (int) $request->query('per_page', 15);
 		return response()->json(Permission::paginate($perPage));
 	}
 	
-    public function viewPermissionById($id)
+	public function viewPermissionById(Request $request, $id)
 	{
+		$this->logRequest($request, __FUNCTION__);
 		$permission = Permission::findOrFail($id);
 		return response()->json($permission);
 	}
 
 	public function store(Request $request, $idUser)
 	{
+		$this->logRequest($request, __FUNCTION__);
 		User::findOrFail($idUser);
 
 		$data = $request->validate([
@@ -44,6 +47,7 @@ class PermissionController extends Controller
 
 	public function updatePermission(Request $request, $idUser, $id)
 	{
+		$this->logRequest($request, __FUNCTION__);
 		User::findOrFail($idUser);
 		$permission = Permission::findOrFail($id);
 
@@ -60,8 +64,9 @@ class PermissionController extends Controller
 		]);
 	}
 
-	public function givePermissionToRole($roleName, $permissionName)
+	public function givePermissionToRole(Request $request, $roleName, $permissionName)
 	{
+		$this->logRequest($request, __FUNCTION__);
 		$role = Role::where('name', $roleName)->first();
 		if (!$role) {
 			return response()->json(['message' => 'Role not found'], 404);
@@ -83,6 +88,7 @@ class PermissionController extends Controller
 
 public function deletePermission(Request $request, $id)
 {
+	$this->logRequest($request, __FUNCTION__);
 	$permission = Permission::findOrFail($id);
 	$permission->delete();
 

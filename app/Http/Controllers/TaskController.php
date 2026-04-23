@@ -42,7 +42,7 @@ class TaskController extends Controller
             'title' => $task->title,
             'description' => $task->description,
             'status' => $task->status,
-            'deadline' => optional($task->deadline)->toJSON(),
+            'deadline' => $task->deadline,
             'priority' => $task->priority,
             'assigned_to' => $task->assigned_to,
             'created_by' => $task->created_by,
@@ -65,6 +65,7 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $query = $this->safeTasksQuery();
 
         if ($request->user()->hasRole('employee')) {
@@ -114,6 +115,7 @@ class TaskController extends Controller
 
     public function store(TaskRequest $request) 
 {
+    $this->logRequest($request, __FUNCTION__);
     $this->authorize('create', Task::class);
 
     $data = $request->validated(); // <-- Récupère les données déjà validées
@@ -122,8 +124,9 @@ class TaskController extends Controller
     $task = Task::create($data);
     return response()->json(['message' => 'Task created', 'task' => $task], 201);
 }
-    public function show($id)
+    public function show(Request $request, $id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $task = Task::with(['creator', 'assignee'])->findOrFail($id);
         $this->authorize('view', $task);
 
@@ -132,6 +135,7 @@ class TaskController extends Controller
 
     public function update(TaskRequest $request, $id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $task = Task::findOrFail($id);
         $this->authorize('update', $task);
 
@@ -142,8 +146,9 @@ class TaskController extends Controller
         return response()->json(['message' => 'Task updated', 'task' => $task]);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $task = Task::findOrFail($id);
         $this->authorize('delete', $task);
 
@@ -155,6 +160,7 @@ class TaskController extends Controller
 
     public function viewTeamMemberTasks(Request $request, $userId)
     {
+        $this->logRequest($request, __FUNCTION__);
         // On récupère les tâches créées par le manager pour cet utilisateur
         $tasks = Task::where('created_by', $request->user()->id)
                      ->where('assigned_to', $userId)
@@ -165,6 +171,7 @@ class TaskController extends Controller
 
     public function assignTask(Request $request, $taskId, $userId)
     {
+        $this->logRequest($request, __FUNCTION__);
         $task = Task::findOrFail($taskId);
         $this->authorize('update', $task); // Seul le créateur peut réassigner
 
@@ -176,6 +183,7 @@ class TaskController extends Controller
 
     public function updateStatus(TaskStatusRequest $request, $id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $task = Task::findOrFail($id);
         $this->authorize('updateStatus', $task); // Assigné OU Créateur autorisé
 
@@ -185,8 +193,9 @@ class TaskController extends Controller
         return response()->json(['message' => 'Status updated']);
     }
 
-    public function getTaskStatistics()
+    public function getTaskStatistics(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         // On vérifie si l'utilisateur a le droit de voir les stats globales
         $this->authorize('viewGlobalStats', Task::class);
 
@@ -197,8 +206,9 @@ class TaskController extends Controller
         ]);
     }
 
-    public function getTaskCount()
+    public function getTaskCount(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $this->authorize('viewGlobalStats', Task::class);
 
         return response()->json([
@@ -206,8 +216,9 @@ class TaskController extends Controller
         ]);
     }
 
-    public function getUserTaskCount($userId, Request $request)
+    public function getUserTaskCount(Request $request, $userId)
     {
+        $this->logRequest($request, __FUNCTION__);
         // Un utilisateur ne peut voir que son propre compteur (ou un admin)
         if ($request->user()->id != $userId && !$request->user()->hasRole('admin')) {
             abort(403);

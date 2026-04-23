@@ -11,6 +11,7 @@ class PasswordResetController extends Controller
 
 public function sendResetLink(Request $request)
 {       
+    $this->logRequest($request, __FUNCTION__);
     $request->validate(['email' => 'required|email|exists:users,email']);
     
     $status = Password::sendResetLink($request->only('email'));
@@ -23,6 +24,7 @@ public function sendResetLink(Request $request)
 
 public function resetPassword(Request $request)
 {
+    $this->logRequest($request, __FUNCTION__);
     $request->validate([
         'token' => 'required|string',
         'email' => 'required|email|exists:users,email',

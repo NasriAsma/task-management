@@ -79,7 +79,7 @@ class UserController extends Controller
 
     public function createUser(UserRequest  $request)
     {
-      
+        $this->logRequest($request, __FUNCTION__);
     $this->authorize('create', User::class);
     
     $validated = $request->validated();
@@ -93,6 +93,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $this->authorize('viewAny', User::class);
 
         $perPage = (int) $request->query('per_page', self::PER_PAGE);
@@ -121,8 +122,10 @@ class UserController extends Controller
 
     public function updateUser(UserRequest $request, $idUser)
     {
-    $user = User::findOrFail($idUser);
-    $this->authorize('update', $user);
+        $this->logRequest($request, __FUNCTION__);
+
+        $user = User::findOrFail($idUser);
+        $this->authorize('update', $user);
 
     $validatedData = $request->validated();
 
@@ -141,9 +144,9 @@ class UserController extends Controller
 
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request)
     { 
-    // On récupère la valeur de recherche envoyée par le frontend
+        $this->logRequest($request, __FUNCTION__);
     $term = $request->input('search');
 
     $user = User::where('id', $term)
@@ -158,8 +161,11 @@ class UserController extends Controller
     return response()->json($user);
 }
 
-    public function deleteUser($id)  
+    public function deleteUser(Request $request, $id)  
     {
+        $this->logRequest($request, __FUNCTION__);
+
+
         $user = User::find($id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -171,8 +177,9 @@ class UserController extends Controller
         return response()->json(['message' => 'User deleted successfully'], 200);
     }
 
-    public function getUser($id)
+    public function getUser(Request $request, $id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $user = $this->safeUsersQuery()->find($id);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -181,8 +188,9 @@ class UserController extends Controller
         return response()->json($this->formatUser($user), 200);
     }
 
-    public function desactiveCompte($idUser)
-    {
+    public function desactiveCompte(Request $request, $idUser)
+    { 
+        $this->logRequest($request, __FUNCTION__);
         $user = User::find($idUser);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -194,8 +202,9 @@ class UserController extends Controller
         return response()->json(['message' => 'User account deactivated successfully'], 200);
     }
 
-    public function activeCompte($idUser)
+    public function activeCompte(Request $request, $idUser)
     {
+        $this->logRequest($request, __FUNCTION__);
         $user = User::find($idUser);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -207,14 +216,16 @@ class UserController extends Controller
         return response()->json(['message' => 'User account activated successfully'], 200);
     }
 
-    public function getNumberofUsers()
+    public function getNumberofUsers(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $count = User::count();
         return response()->json(['number_of_users' => $count], 200);
     }
 
-    public function getStatistiqueUser()
+    public function getStatistiqueUser(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $this->authorize('viewAny', User::class);
 
         $statistique = [
@@ -230,8 +241,9 @@ class UserController extends Controller
 
 
 
-public function getUserPermissions($idUser)
+public function getUserPermissions(Request $request, $idUser)
 {
+    $this->logRequest($request, __FUNCTION__);
     $user = User::find($idUser);
     if (!$user) {
         return response()->json(['message' => 'User not found'], 404);

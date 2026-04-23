@@ -21,6 +21,7 @@ class ProfileController extends Controller
 
     public function toggle2FA(Request $request)
     {
+        $this->logRequest($request, __FUNCTION__);
         $user = $request->user();
         if ($request->has('is_2fa_enabled')) {
             $request->validate(['is_2fa_enabled' => 'required|boolean']);
@@ -50,8 +51,9 @@ class ProfileController extends Controller
 
 
 
-public function requestUpdateCode(request $request)
+public function requestUpdateCode(Request $request)
 {  $user =$request->user();
+    $this->logRequest($request, __FUNCTION__);
     // générer un code 2FA
  $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     $user->code_2FA = $code;
@@ -75,8 +77,9 @@ public function requestUpdateCode(request $request)
 
 
 
-public function updateUser(request $request)
+public function updateUser(Request $request)
 {   
+    $this->logRequest($request, __FUNCTION__);
     $user = $request->user();
 
     $is_sensitive = $request->filled('email') || $request->filled('password');
@@ -138,6 +141,7 @@ public function updateUser(request $request)
 
 public function getUser(Request $request)
 {
+    $this->logRequest($request, __FUNCTION__);
     $user = $request->user();
 
     return response()->json([

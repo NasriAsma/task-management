@@ -10,6 +10,7 @@ class RoleController extends Controller
 {
     public function assignRole(Request $request, $roleName ,$id)
     {
+        $this->logRequest($request, __FUNCTION__);
         $user = User::findOrFail($id);
 
         $role = Role::where('name', $roleName)->first();
@@ -28,6 +29,7 @@ class RoleController extends Controller
 
     public function hasRole(Request $request, $roleName)
 {
+    $this->logRequest($request, __FUNCTION__);
     $user = $request->user();
     $hasRole = $user->hasRole($roleName);
 
@@ -42,6 +44,7 @@ class RoleController extends Controller
 
 public function getRoles(Request $request)
 {
+    $this->logRequest($request, __FUNCTION__);
     $user = $request->user();
     $roles = $user->roles->pluck('name'); 
 
@@ -53,6 +56,7 @@ public function getRoles(Request $request)
 
 public function removeRole (Request $request, $roleName, $id )
 {
+    $this->logRequest($request, __FUNCTION__);
     $user = User::findOrFail($id);
 
     $role = Role::where('name', $roleName)->first();

@@ -24,6 +24,7 @@ class AuthController extends Controller
 
 public function login(Request $request)
 {     
+    $this->logRequest($request, __FUNCTION__);
     $request->validate([
         'email'    => 'required|email',
         'password' => 'required|string',
@@ -77,6 +78,7 @@ public function login(Request $request)
 
 public function verify2fa(Request $request)
 {
+    $this->logRequest($request, __FUNCTION__);
     $request->validate([
         'email' => 'required|email',
         'code'  => 'required|string'
@@ -111,9 +113,12 @@ public function verify2fa(Request $request)
 
 
 
-public function register( request $request )
-{     $request->validate([
-    'name'=>'required|string',
+public function register(Request $request)
+
+{  
+      $this->logRequest($request, __FUNCTION__);
+
+$request->validate(['name'=>'required|string',
     'email'=>'required|email|unique:users,email',
     'password'=>'required|string|confirmed|min:6'
 ]);
@@ -137,8 +142,9 @@ public function register( request $request )
 
 
 
-public function logout(request $request)
+public function logout(Request $request)
 {
+    $this->logRequest($request, __FUNCTION__);
   $request->user()->currentAccessToken()->delete();
   return response()->json([
     'message' => ' logged out successfully'

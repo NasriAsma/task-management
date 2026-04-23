@@ -62,3 +62,43 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Docker
+
+This project includes a Docker setup for local development.
+
+### Start containers
+
+```bash
+docker compose up --build
+```
+
+Application URL:
+
+- http://localhost:8000
+
+Database connection used by Docker:
+
+- Host: `db`
+- Port: `3306`
+- Database: `task_management`
+- User: `task_user`
+- Password: `task_password`
+
+If needed, stop containers with:
+
+```bash
+docker compose down
+```
+
+## GitHub Actions
+
+A CI workflow is available in `.github/workflows/ci.yml`.
+
+It runs automatically on push and pull request, and performs:
+
+- Composer install
+- NPM install and production build
+- Laravel app key generation
+- MySQl migration
+- Test execution with `php artisan test`

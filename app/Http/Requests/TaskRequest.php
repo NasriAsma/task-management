@@ -27,10 +27,10 @@ class TaskRequest extends FormRequest
             return [
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
-                'due_date'    => 'nullable|date',
+                'deadline'    => 'nullable|date',
                 'priority'    => 'nullable|in:low,medium,high',
                 'assigned_to' => 'nullable|exists:users,id',
-                'created_by' => 'required|exists:users,id'
+                'status'      => 'required|in:pending,in_progress,completed',
             ];
         }
 
@@ -38,10 +38,10 @@ class TaskRequest extends FormRequest
         return [
             'title'    => 'sometimes|string|max:255',
             'description' => 'sometimes|nullable|string',
+            'deadline' => 'sometimes|nullable|date',
             'priority' => 'sometimes|in:low,medium,high',
             'status'   => 'sometimes|in:pending,in_progress,completed',
             'assigned_to' => 'sometimes|nullable|exists:users,id',
-            'created_by' => 'sometimes|exists:users,id'
 
         ];
     }

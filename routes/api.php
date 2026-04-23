@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->post('/toggle-2fa',[ProfileController::class,
 Route::middleware('auth:sanctum')->post('/request-update-code',[ProfileController::class,'requestUpdateCode']);
 Route::middleware('auth:sanctum')->put('/update-profile',[ProfileController::class,'updateUser']);
 Route::middleware('auth:sanctum')->get('/user',[ProfileController::class,'getUser']);
+Route::middleware('auth:sanctum')->get('/audits/user/{userId}', [AuditController::class, 'userAudits']);
 Route::middleware('auth:sanctum')->post('/assign-role/{roleName}', [RoleController::class, 'assignRole']);
 Route::middleware('auth:sanctum')->get('/has-role/{roleName}', [RoleController::class, 'hasRole']);
 Route::middleware('auth:sanctum')->get('/get-roles', [RoleController::class, 'getRoles']);
@@ -55,10 +56,7 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:active_compte')->post('/activecompte/{idUser}', [UserController::class, 'activeCompte']);
     Route::middleware('permission:desactive_compte')->put('/desactivecompte/{idUser}', [UserController::class, 'desactiveCompte']);
     Route::middleware('permission:recherche_user')->get('/rechercheuser', [UserController::class, 'store']);
-
-
-    Route::middleware(['permission:view_audits', 'api.audit'])->get('/users/{user}/audits', [AuditController::class, 'getUserAudits']);
-
+    Route::middleware('permission:view_audits')->get('/audits', [AuditController::class, 'index']);
 
     Route::middleware('permission:view_permission_by_id')->get('/permissions/{id}', [UserController::class, 'getUserPermissions']);
     Route::middleware('permission:view_all_permission')->get('/permissions', [PermissionController::class, 'index']);

@@ -13,7 +13,7 @@ use App\Models\User;
 
 class Task extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
     protected $fillable = [
         'title',
         'description',
