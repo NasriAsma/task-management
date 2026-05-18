@@ -1,11 +1,8 @@
-version: "3.9"
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: task_management_app
     ports:
       - "8000:8000"
     environment:
@@ -14,24 +11,24 @@ services:
       APP_URL: http://localhost:8000
       DB_CONNECTION: mysql
       DB_HOST: db
-      DB_PORT: 3306
+      DB_PORT: 3306  # Reste 3306 car Laravel communique en interne dans le réseau Docker
       DB_DATABASE: task_management
       DB_USERNAME: task_user
       DB_PASSWORD: task_password
     volumes:
       - ./:/var/www/html
     command: >
-      sh -c "composer install --no-interaction --prefer-dist --optimize-autoloader &&
-      php artisan key:generate --force &&
-      php artisan migrate --force &&
-      php artisan serve --host=0.0.0.0 --port=8000"
+      sh -c "php docker/wait-for-db.php && composer install --no-interaction --prefer-dist --optimize-autoloader && php artisan key:generate --force && php artisan optimize:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8000"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      task-management-network:
+        aliases:
+          - task_management_app
 
   db:
     image: mysql:8.0
-    container_name: task_management_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: task_management
@@ -39,7 +36,7 @@ services:
       MYSQL_PASSWORD: task_password
       MYSQL_ROOT_PASSWORD: root_password
     ports:
-      - "3307:3306"
+      - "3308:3306" # CHANGÉ ICI : 3308 pour éviter le conflit avec le 3307 de XAMPP
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -47,6 +44,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      task-management-network:
+        aliases:
+          - task_management_db
+
+  # NOUVEAU SERVICE ADMINER
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "8081:8080" # Accessible sur localhost:8081 (Adminer tourne sur 8080 en interne)
+    environment:
+      ADMINER_DEFAULT_SERVER: db # Pré-remplit le champ serveur avec le nom du conteneur MySQL
+    depends_on:
+      - db
+    networks:
+      - task-management-network
 
 volumes:
   mysql_data:
+
+networks:
+  task-management-network:
+    external: true

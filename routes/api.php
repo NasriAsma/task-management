@@ -24,8 +24,7 @@ use App\Http\Controllers\ProfileController;
 
 
 Route::post('/register',[AuthController::class,'register']);
-Route::post('/login',[AuthController::class,'login']);
-
+Route::post('/login',[AuthController::class,'login'])->name('login');
 Route::post('/forgot-password',[PasswordResetController::class,'sendResetLink']);
 Route::post('/reset-password',[PasswordResetController::class,'resetPassword']);
 
