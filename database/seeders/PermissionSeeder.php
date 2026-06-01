@@ -22,6 +22,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'desactive_compte', 'description' => 'Désactiver un compte utilisateur'],
             ['name' => 'recherche_user', 'description' => 'Rechercher un utilisateur'],
             // Audit Permissions
+
             ['name' => 'view_audits', 'description' => 'Voir les audits'],
 
             // Permission Management Permissions
@@ -41,7 +42,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_all_Number_of_task', 'description' => 'Voir le nombre total de tâches'],
             ['name' => 'view_Number_of_task_for_user', 'description' => 'Voir le nombre de tâches pour un utilisateur'],
             ['name' => 'view_Number_of_team_tasks_for_user', 'description' => 'Voir le nombre de tâches d\'équipe pour un utilisateur'],
-
+            ['name' => 'view_dashboard', 'description' => 'Voir le dashboard'],
             // Task Permissions
             ['name' => 'create_task', 'description' => 'Créer une tâche'],
             ['name' => 'update_task', 'description' => 'Modifier une tâche'],

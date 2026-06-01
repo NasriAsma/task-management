@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\UserRequest;
+use App\Traits\StandardizedResponse;
 use Illuminate\Support\Facades\Hash;
 
 
 
 class UserController extends Controller
-{   private const PER_PAGE = 15;
+{
+    use StandardizedResponse;   private const PER_PAGE = 15;
 
     private const SAFE_USER_COLUMNS = [
         'id',
@@ -219,8 +221,10 @@ class UserController extends Controller
     public function getNumberofUsers(Request $request)
     {
         $this->logRequest($request, __FUNCTION__);
-        $count = User::count();
-        return response()->json(['number_of_users' => $count], 200);
+        $stats = [
+            'number_of_users' => User::count(),
+        ];
+        return $this->statsResponse($stats, 'users');
     }
 
     public function getStatistiqueUser(Request $request)
@@ -228,15 +232,25 @@ class UserController extends Controller
         $this->logRequest($request, __FUNCTION__);
         $this->authorize('viewAny', User::class);
 
-        $statistique = [
-            'total_users' => User::count(),
-            'active_users' => User::where('is_active', true)->count(),
-            'inactive_users' => User::where('is_active', false)->count(),
+        $total = User::count();
+        $active = User::where('is_active', true)->count();
+        $inactive = User::where('is_active', false)->count();
+        $twoFaEnabled = User::where('is_2fa_enabled', true)->count();
+
+        $counts = [
+            'active' => $active,
+            'inactive' => $inactive,
         ];
 
-        return response()->json([
-            'statistique' => $statistique,
-        ], 200);
+        $stats = [
+            'total' => $total,
+            'by_status' => $counts,
+            'percentages' => $this->statsWithPercentages($counts),
+            'two_fa_enabled' => $twoFaEnabled,
+            'security_score' => $total > 0 ? round(($twoFaEnabled / $total) * 100, 2) : 0,
+        ];
+
+        return $this->statsResponse($stats, 'users');
     }
 
 

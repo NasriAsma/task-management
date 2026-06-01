@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Traits\StandardizedResponse;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskRequest;
 use App\Http\Requests\TaskStatusRequest;
 
 class TaskController extends Controller
 {
+    use StandardizedResponse;
     private const PER_PAGE = 15;
 
     private const SAFE_TASK_COLUMNS = [
@@ -196,14 +199,32 @@ class TaskController extends Controller
     public function getTaskStatistics(Request $request)
     {
         $this->logRequest($request, __FUNCTION__);
-        // On vérifie si l'utilisateur a le droit de voir les stats globales
         $this->authorize('viewGlobalStats', Task::class);
 
-        return response()->json([
-            'total_tasks' => Task::count(),
-            'completed'   => Task::where('status', 'completed')->count(),
-            'pending'     => Task::where('status', 'pending')->count(),
-        ]);
+        $total = Task::count();
+        $completed = Task::where('status', 'completed')->count();
+        $pending = Task::where('status', 'pending')->count();
+        $inProgress = Task::where('status', 'in_progress')->count();
+        $cancelled = Task::where('status', 'cancelled')->count();
+
+        $counts = [
+            'completed' => $completed,
+            'pending' => $pending,
+            'in_progress' => $inProgress,
+            'cancelled' => $cancelled,
+        ];
+
+        $stats = [
+            'total' => $total,
+            'by_status' => $counts,
+            'percentages' => $this->statsWithPercentages($counts),
+            'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 2) : 0,
+            'overdue' => Task::where('deadline', '<', Carbon::now())
+                ->where('status', '!=', 'completed')
+                ->count(),
+        ];
+
+        return $this->statsResponse($stats, 'tasks');
     }
 
     public function getTaskCount(Request $request)
@@ -211,9 +232,12 @@ class TaskController extends Controller
         $this->logRequest($request, __FUNCTION__);
         $this->authorize('viewGlobalStats', Task::class);
 
-        return response()->json([
+        $stats = [
             'total_tasks' => Task::count(),
-        ]);
+            'completed_tasks' => Task::where('status', 'completed')->count(),
+        ];
+
+        return $this->statsResponse($stats, 'task_count');
     }
 
     public function getUserTaskCount(Request $request, $userId)

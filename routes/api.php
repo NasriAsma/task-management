@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,8 +70,14 @@ Route::middleware(['auth:sanctum', 'role:admin' , ])->group(function () {
     Route::middleware('permission:view_all_Number_of_task')->get('/numberoftasks', [TaskController::class, 'getTaskCount']);
     Route::middleware('permission:view_Number_of_task_for_user')->get('/numberoftasksforuser/{userId}', [TaskController::class, 'getUserTaskCount']);
    
+    // === DASHBOARD ROUTES ===
+    Route::middleware('permission:view_dashboard')->get('/dashboard', [DashboardController::class, 'index']);
+    Route::middleware('permission:view_dashboard')->get('/dashboard/tasks', [DashboardController::class, 'tasks']);
+    Route::middleware('permission:view_dashboard')->get('/dashboard/users', [DashboardController::class, 'users']);
+    Route::middleware('permission:view_dashboard')->get('/dashboard/timeline', [DashboardController::class, 'timeline']);
+    Route::middleware('permission:view_dashboard')->get('/dashboard/user-statistics', [DashboardController::class, 'userStatistics']);
+    Route::middleware('permission:view_dashboard')->get('/dashboard/priority-statistics', [DashboardController::class, 'priorityStatistics']);
 
-  
     Route::middleware('permission:assign_role')->post('/assignrole/{roleName}/{id}', [RoleController::class, 'assignRole']);
     Route::middleware('permission:delete_role')->put('/removerole/{roleName}/{id}', [RoleController::class, 'removeRole']);
    
